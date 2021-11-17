@@ -1,17 +1,62 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ImageBackground, TextInput, Button, Pressable } from 'react-native';
+import { StyleSheet, Alert, Text, View, ImageBackground, TextInput, Button, Pressable, Modal} from 'react-native';
 // background image
 const image = require('../assets/project_assets/bg.png')
 class Start extends Component {
   constructor(props){
     super(props)
     this.state = {
-      name:''
+      name:'',
+      modalVisible: false
     }
   }
+  handleModal = () => {
+    if(!this.state.modalVisible){
+      return this.setState({modalVisible: true})
+    }else{
+      return this.setState({modalVisible:false})  
+    }
+    
+  }
+
   render() {
     return (
       <View style={styles.container}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            this.setState(!this.state.modalVisible);
+          }}
+        >
+        <View style={[styles.innerModal, styles.centeredView]}>
+
+          {/* color selction */}
+          <View>
+            <View 
+              style={styles.purple}
+            />
+          </View>
+          <View>
+            <View 
+              style={styles.orange}
+            />
+          </View>
+          
+          <View style={styles.header}>
+            <Text>modal</Text>
+            <Pressable
+              onPress={() => this.handleModal()}
+            >
+              <Text>Close</Text>
+            </Pressable>
+          </View>
+          
+          
+        </View>
+        </Modal>
       <ImageBackground
         source={image}
         resizeMode='cover'
@@ -20,6 +65,10 @@ class Start extends Component {
         {/* navbar */}
         <View style={styles.header}>
           <Text style={styles.headerText}>Chat</Text>
+          <Pressable onPress={() => this.handleModal()}>
+            <Text style={styles.headerText}>Colors</Text>
+          </Pressable>
+          
         </View>
 
           {/* input */}
@@ -52,20 +101,43 @@ const styles = StyleSheet.create({
     justifyContent:'space-around',
     flexDirection:'column',
   },
-  
+  innerModal:{
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
   header:{
     flex:1,
+    flexDirection:'row',
+    alignItems:'center',
     position:'relative',
     alignSelf:'stretch',
+    justifyContent:'space-between',
     top:0,
     maxHeight:'10%',
     width:'auto',
     paddingTop:15,
-    paddingLeft:20
+    paddingLeft:20,
+    paddingRight:20
   },
   headerText:{
     color:'white',
-    height:100,
     fontSize: 25
   },
   main:{
@@ -74,8 +146,9 @@ const styles = StyleSheet.create({
   cta:{
     marginBottom:150
   },
+  // button text
   text:{
-    color:'white',
+    color:'black',
     fontSize:35
   },
   input:{
@@ -91,8 +164,20 @@ const styles = StyleSheet.create({
     
   },
   button:{
-    backgroundColor:'green',
+    backgroundColor:'whitesmoke',
     padding:10,
     borderRadius:10
+  },
+  purple :{
+    backgroundColor: 'purple',
+    width:100,
+    height:100,
+    borderRadius: 50
+  },
+  orange :{
+    backgroundColor: 'orange',
+    width:100,
+    height:100,
+    borderRadius: 50
   }
 });
