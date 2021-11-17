@@ -1,10 +1,20 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
 class Start extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      
+    }
+  }
   render() {
     return (
       <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
+        <Text>hello</Text>
+        <Button 
+          title='Go to chat'
+          onPress={() => this.props.navigation.navigate('Chat')}
+        />
       </View>
     );
   }
