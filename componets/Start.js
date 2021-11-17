@@ -17,26 +17,27 @@ class Start extends Component {
         resizeMode='cover'
         style={styles.image}
       >
-      
+        {/* navbar */}
         <View style={styles.header}>
           <Text style={styles.headerText}>Chat</Text>
         </View>
-          
+
+          {/* input */}
         <View style={styles.main}>
           <TextInput 
                 style={styles.input}
                 onChangeText={(text) => this.setState({name: text})}
               />
         </View>
+        {/* call to action */}
         <View style={styles.cta}>
           <Pressable style={styles.button} onPress={() => this.props.navigation.navigate('Chat', {name: this.state.name})}>
-                <Text
-                  style={styles.text}
-                >Go to Chat</Text>
-              </Pressable>
-        </View>
-      
-      
+              <Text
+              style={styles.text}
+              >Go to Chat
+            </Text>
+          </Pressable>
+        </View>      
       </ImageBackground>
       </View>
     );
