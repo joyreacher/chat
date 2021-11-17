@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import { StyleSheet, Text, View, ImageBackground, TextInput, Button } from 'react-native';
+// background image
+const image = require('../assets/project_assets/bg.png')
 class Start extends Component {
   constructor(props){
     super(props)
@@ -11,14 +12,21 @@ class Start extends Component {
   render() {
     return (
       <View style={styles.container}>
+      <ImageBackground
+        source={image}
+        resizeMode='cover'
+        style={styles.image}
+      >
         <Text>hello</Text>
-        <TextInput 
-          onChangeText={(text) => this.setState({name: text})}
-        />
-        <Button 
-          title='Go to chat'
-          onPress={() => this.props.navigation.navigate('Chat', {name: this.state.name})}
-        />
+          <TextInput 
+            style={styles.input}
+            onChangeText={(text) => this.setState({name: text})}
+          />
+          <Button 
+            title='Go to chat'
+            onPress={() => this.props.navigation.navigate('Chat', {name: this.state.name})}
+          />
+      </ImageBackground>
       </View>
     );
   }
@@ -28,9 +36,16 @@ export default Start;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex:1,
   },
+  input:{
+    backgroundColor:'red',
+    width:300,
+    height:50
+  },
+  image: {
+    flex:1,
+    justifyContent: 'center',
+    alignItems:'center',
+  }
 });
