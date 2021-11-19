@@ -7,7 +7,7 @@ class Start extends Component {
     super(props)
     this.state = {
       name:'',
-      modalVisible: false
+      modalVisible: true
     }
   }
   handleModal = () => {
@@ -24,36 +24,34 @@ class Start extends Component {
       <View style={styles.container}>
         <Modal
           animationType="fade"
-          transparent={true}
+          transparent={false}
           visible={this.state.modalVisible}
           onRequestClose={() => {
             Alert.alert("Modal has been closed.");
             this.setState(!this.state.modalVisible);
           }}
         >
-        <View style={[styles.innerModal, styles.centeredView]}>
+        {/* main modal section */}
+        <View style={styles.innerModal}>
+        
+          {/* close button */}
+          <View style={[styles.selectionContainer, styles.header]}>
+            <Text>modal</Text>
+            <Button
+              title='Close'
+              onPress={() => this.handleModal()}
+            />
+          </View>
 
           {/* color selction */}
-          <View>
+          <View style={styles.colorSelectionContainer}>
             <View 
               style={styles.purple}
             />
-          </View>
-          <View>
-            <View 
+            <View
               style={styles.orange}
             />
           </View>
-          
-          <View style={styles.header}>
-            <Text>modal</Text>
-            <Pressable
-              onPress={() => this.handleModal()}
-            >
-              <Text>Close</Text>
-            </Pressable>
-          </View>
-          
           
         </View>
         </Modal>
@@ -96,16 +94,33 @@ class Start extends Component {
 export default Start;
 
 const styles = StyleSheet.create({
+  colorSelectionContainer:{
+    marginTop:100,
+    flex:1,
+    flexDirection:'row',
+    justifyContent:'space-evenly',
+    flexWrap:'wrap',
+    width:'100vw',
+    width:300,
+    maxWidth:'100%'
+  },
+  selectionContainer:{
+    flex:1,
+    alignItems: "center",
+    flexDirection:'row',
+    justifyContent: 'space-between',
+    marginBottom:100
+  },
   container: {
     flex:1,
     justifyContent:'space-around',
-    flexDirection:'column',
   },
   innerModal:{
+    flex:1,
+    // flexDirection:'row',
     margin: 20,
-    backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
+    padding:25,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -118,13 +133,14 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
+    // flexDirection:'row',
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22
   },
   header:{
     flex:1,
-    flexDirection:'row',
+    // flexDirection:'row',
     alignItems:'center',
     position:'relative',
     alignSelf:'stretch',
@@ -159,6 +175,7 @@ const styles = StyleSheet.create({
   },
   image: {
     flex:1,
+    // flexDirection:'row',
     justifyContent: 'space-between',
     alignItems:'center',
     
@@ -170,14 +187,14 @@ const styles = StyleSheet.create({
   },
   purple :{
     backgroundColor: 'purple',
-    width:100,
-    height:100,
+    width:50,
+    height:50,
     borderRadius: 50
   },
   orange :{
     backgroundColor: 'orange',
-    width:100,
-    height:100,
+    width:50,
+    height:50,
     borderRadius: 50
   }
 });
