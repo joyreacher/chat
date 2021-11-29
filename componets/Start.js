@@ -36,9 +36,25 @@ class Start extends Component {
         {/* call to action */}
         <View style={styles.containerCta}>
         <TextInput 
-                style={styles.input}
-                onChangeText={(text) => this.setState({name: text})}
+          placeholder='Enter Your Name'
+          style={styles.input}
+          onChangeText={(text) => this.setState({name: text})}
+        />
+        <View style={styles.colorSelectionContainer}>
+          <Text>Choose a background color:</Text>
+          <View style={styles.colorSelection}>
+            {/* color selction */}
+              <View 
+                style={styles.purple}
               />
+              <View
+                style={styles.orange}
+              />
+              <View
+                style={styles.green}
+              />
+          </View>
+        </View>
           <View style={styles.cta}>
             <Pressable style={styles.button} onPress={() => this.props.navigation.navigate('Chat', {name: this.state.name})}>
                 <Text
@@ -58,10 +74,24 @@ class Start extends Component {
 export default Start;
 
 const styles = StyleSheet.create({
+  colorSelectionContainer:{
+    marginTop:30,
+    marginBottom:0,
+    
+  },
+  colorSelection:{
+    marginTop:15,
+    marginBottom:40,
+    flex:1,
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'flex-end',
+    flexWrap:'wrap',
+  },
   containerCta:{
     position:'relative',
     bottom:50,
-    height:270,
+    height:300,
     width:300,
     alignSelf:'center',
     padding:23,
@@ -104,6 +134,9 @@ const styles = StyleSheet.create({
     fontSize: 56
   },
   input:{
+    padding:10,
+    borderWidth:1,
+    borderColor:'black',
     borderRadius:5,
     backgroundColor:'white',
     height:50
@@ -116,6 +149,7 @@ const styles = StyleSheet.create({
     
   },
   button:{
+    marginTop:50,
     backgroundColor:'whitesmoke',
     padding:10,
     borderRadius:10
@@ -128,6 +162,12 @@ const styles = StyleSheet.create({
   },
   orange :{
     backgroundColor: 'orange',
+    width:50,
+    height:50,
+    borderRadius: 50
+  },
+  green :{
+    backgroundColor: 'green',
     width:50,
     height:50,
     borderRadius: 50
