@@ -7,16 +7,17 @@ class Start extends Component {
     super(props)
     this.state = {
       name:'',
-      modalVisible: false
+      color:'',
+      colors: {
+        black:'#0F120E',
+        purple:'#757082',
+        green:'#B8C6AE',
+        blue:'#637380'
+      }
     }
   }
-  handleModal = () => {
-    if(!this.state.modalVisible){
-      return this.setState({modalVisible: true})
-    }else{
-      return this.setState({modalVisible:false})  
-    }
-    
+  handleColorSelection = (colorSelection) => {
+    return this.setState({color:colorSelection})  
   }
 
   render() {
@@ -31,6 +32,7 @@ class Start extends Component {
         <View style={styles.main}>
           <Text style={styles.title}>
             Chat
+            {this.state.color}
           </Text>
         </View>
         {/* call to action */}
@@ -40,26 +42,58 @@ class Start extends Component {
           style={styles.input}
           onChangeText={(text) => this.setState({name: text})}
         />
+        
+        
+        {/* color selction */}
         <View style={styles.colorSelectionContainer}>
           <Text>Choose a background color:</Text>
           <View style={styles.colorSelection}>
-            {/* color selction */}
-              <View 
-                style={[styles.black, styles.colorSelectionSize]}
-              />
-              <View
-                style={[styles.purple, styles.colorSelectionSize]}
-              />
-              <View
-                style={[styles.green, styles.colorSelectionSize]}
-              />
-              <View
-                style={[styles.blue, styles.colorSelectionSize]}
-              />
+              <Pressable
+                onPress={() => this.handleColorSelection(this.state.colors.black)}
+                style={styles.colorSelectionSize}
+              >
+                <View 
+                  style={[styles.black, styles.colorSelectionSize]}
+                />
+              </Pressable>
+              <Pressable
+                onPress={() => this.handleColorSelection(this.state.colors.purple)}
+                style={styles.colorSelectionSize}
+              >
+                <View
+                  style={[styles.purple, styles.colorSelectionSize]}
+                />
+              </Pressable>
+              
+              <Pressable
+                onPress={() => this.handleColorSelection(this.state.colors.green)}
+                style={styles.colorSelectionSize}
+              >
+                <View
+                  style={[styles.green, styles.colorSelectionSize]}
+                />
+              </Pressable>
+              
+              <Pressable
+                onPress={() => this.handleColorSelection(this.state.colors.blue)}
+                style={styles.colorSelectionSize}
+              >
+                <View
+                  style={[styles.blue, styles.colorSelectionSize]}
+                />
+              </Pressable>
           </View>
         </View>
+        
+        {/* Go to Chat Button */}
           <View style={styles.cta}>
-            <Pressable style={styles.button} onPress={() => this.props.navigation.navigate('Chat', {name: this.state.name})}>
+            <Pressable
+              style={styles.button}
+              onPress={() => {
+                // Send name and color state as props to chat
+                this.props.navigation.navigate('Chat', {name: this.state.name, color: this.state.color})
+                }
+              }>
                 <Text
                 style={styles.text}
                 >Go to Chat
