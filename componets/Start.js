@@ -7,7 +7,7 @@ class Start extends Component {
     super(props)
     this.state = {
       name:'',
-      modalVisible: true
+      modalVisible: false
     }
   }
   handleModal = () => {
@@ -36,7 +36,7 @@ class Start extends Component {
         
           {/* close button */}
           <View style={[styles.selectionContainer, styles.header]}>
-            <Text>modal</Text>
+            <Text>Set UI Background</Text>
             <Button
               title='Close'
               onPress={() => this.handleModal()}
@@ -77,14 +77,17 @@ class Start extends Component {
               />
         </View>
         {/* call to action */}
-        <View style={styles.cta}>
-          <Pressable style={styles.button} onPress={() => this.props.navigation.navigate('Chat', {name: this.state.name})}>
-              <Text
-              style={styles.text}
-              >Go to Chat
-            </Text>
-          </Pressable>
-        </View>      
+        <View style={styles.containerCta}>
+          <View style={styles.cta}>
+            <Pressable style={styles.button} onPress={() => this.props.navigation.navigate('Chat', {name: this.state.name})}>
+                <Text
+                style={styles.text}
+                >Go to Chat
+              </Text>
+            </Pressable>
+          </View>      
+        </View>
+        
       </ImageBackground>
       </View>
     );
@@ -94,6 +97,23 @@ class Start extends Component {
 export default Start;
 
 const styles = StyleSheet.create({
+  containerCta:{
+    position:'relative',
+    bottom:50,
+    height:270,
+    width:300,
+    alignSelf:'center',
+    padding:23,
+    backgroundColor:'black',
+    shadowOpacity:.5,
+    shadowRadius:7,
+    shadowColor:'black',
+    shadowOffset:{
+      width:-6,
+      height:8
+    },
+    borderRadius:22
+  },
   colorSelectionContainer:{
     marginTop:100,
     flex:1,
@@ -133,21 +153,21 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    // flexDirection:'row',
+    flexDirection:'row',
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22
   },
   header:{
     flex:1,
-    // flexDirection:'row',
+    flexDirection:'row',
     alignItems:'center',
     position:'relative',
     alignSelf:'stretch',
     justifyContent:'space-between',
     top:0,
     maxHeight:'10%',
-    width:'auto',
+    width:'100%',
     paddingTop:15,
     paddingLeft:20,
     paddingRight:20
