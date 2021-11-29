@@ -8,15 +8,21 @@ class Chat extends Component {
   }
   render() {
     // name holds the name value from the route prop/hook
-    let { name } = this.props.route.params
+    let { name, color } = this.props.route.params
     // Add the name to top of screen
     this.props.navigation.setOptions({ title: name})
     return (
-      <View style={styles.container}>
+      <View style={{
+        backgroundColor: color,
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
         <Text>CHAT</Text>
         {/* using the 'name' container */}
         <Text>
           {name}
+          {color.color}
         </Text>
         <Button
           title='Go back'
