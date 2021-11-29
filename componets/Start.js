@@ -45,13 +45,16 @@ class Start extends Component {
           <View style={styles.colorSelection}>
             {/* color selction */}
               <View 
-                style={styles.purple}
+                style={[styles.black, styles.colorSelectionSize]}
               />
               <View
-                style={styles.orange}
+                style={[styles.purple, styles.colorSelectionSize]}
               />
               <View
-                style={styles.green}
+                style={[styles.green, styles.colorSelectionSize]}
+              />
+              <View
+                style={[styles.blue, styles.colorSelectionSize]}
               />
           </View>
         </View>
@@ -122,11 +125,12 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   cta:{
-    marginBottom:150
+    marginBottom:10
   },
   // button text
   text:{
-    color:'black',
+    textAlign:'center',
+    color:'rgb(255, 255, 255)',
     fontSize:35
   },
   title:{
@@ -150,26 +154,25 @@ const styles = StyleSheet.create({
   },
   button:{
     marginTop:50,
-    backgroundColor:'whitesmoke',
+    backgroundColor:'#757082',
     padding:10,
     borderRadius:10
   },
-  purple :{
-    backgroundColor: 'purple',
-    width:50,
-    height:50,
+  colorSelectionSize:{
+    width:40,
+    height:40,
     borderRadius: 50
   },
-  orange :{
-    backgroundColor: 'orange',
-    width:50,
-    height:50,
-    borderRadius: 50
+  black :{
+    backgroundColor: '#0F120E',
+  },
+  purple :{
+    backgroundColor: '#757082',
   },
   green :{
-    backgroundColor: 'green',
-    width:50,
-    height:50,
-    borderRadius: 50
+    backgroundColor: '#B8C6AE',
+  },
+  blue :{
+    backgroundColor: '#637380',
   }
 });
