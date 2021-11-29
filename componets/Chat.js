@@ -11,27 +11,35 @@ class Chat extends Component {
     let { name, color } = this.props.route.params
     // Add the name to top of screen
     this.props.navigation.setOptions({ title: name})
+    
     return (
       <View style={[{backgroundColor: color}, styles.container]}>
-        <Text
-          style={styles.text}
-        >CHAT</Text>
-        {/* using the 'name' container */}
-        <Text
-          style={styles.text}
-        >
-          Hello {name},
-          You Chose {color} as your background.
-        </Text>
-        <Pressable
-          style={styles.button}
-          title='Go back'
-          // calls on the navigation's navigate prop.
-          // Navigates you to 'Start'
-          onPress={() => this.props.navigation.navigate('Start')}
-        >
-        <Text style={styles.buttonText}>Go Back</Text>
-        </Pressable>
+        <View style={styles.main}>
+          <Text style={styles.title}>CHAT</Text>
+        </View>
+        
+        <View style={styles.main}>
+          <View style={styles.responseContainer}>
+            <Text style={styles.text}>
+              Hello <Text style={styles.data}>{name}</Text>,
+              You Chose <Text style={styles.data}>{color}</Text> as your background.
+            </Text>
+          </View>
+          
+          <View style={styles.main}>
+            <Pressable
+              style={styles.button}
+              title='Go back'
+              // calls on the navigation's navigate prop.
+              // Navigates you to 'Start'
+              onPress={() => this.props.navigation.navigate('Start')}
+            >
+            <Text style={styles.buttonText}>Go Back</Text>
+            </Pressable>
+          </View>
+        </View>
+        
+        
       </View>
     );
   }
@@ -40,13 +48,31 @@ class Chat extends Component {
 export default Chat;
 
 const styles = StyleSheet.create({
+  responseContainer:{
+    padding:5
+  },
+  main:{
+    height: 100,
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center'
+  },
+  data:{
+    color: '#FFFFFF'
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   text: {
-    color: 'rgb(255, 255, 255)'
+    color: '#757083',
+    fontSize: 16
+  },
+  title: {
+    color:'#FFFFFF',
+    fontSize: 45,
+    fontWeight: '600'
   },
   button:{
     width: 100,

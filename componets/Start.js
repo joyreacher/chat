@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Alert, Text, View, ImageBackground, TextInput, Button, Pressable, Modal} from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, TextInput, Pressable, KeyboardAvoidingView} from 'react-native';
 // background image
 const image = require('../assets/project_assets/bg.png')
 class Start extends Component {
@@ -9,10 +9,10 @@ class Start extends Component {
       name:'',
       color:'',
       colors: {
-        black:'#0F120E',
-        purple:'#757082',
-        green:'#B8C6AE',
-        blue:'#637380'
+        black:'#090C08',
+        purple:'#474056',
+        green:'#8A95A5',
+        blue:'#B9C6AE'
       }
     }
   }
@@ -22,71 +22,70 @@ class Start extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView  behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <ImageBackground
         source={image}
         resizeMode='cover'
         style={styles.image}
       >
-        {/* input */}
-        <View style={styles.main}>
-          <Text style={styles.title}>
-            Chat
-          </Text>
-        </View>
-        {/* call to action */}
-        <View style={styles.containerCta}>
-        <TextInput 
-          placeholder='Enter Your Name'
-          style={styles.input}
-          onChangeText={(text) => this.setState({name: text})}
-        />
-        
-        {/* color selction */}
-        <View style={styles.colorSelectionContainer}>
-          <Text>Choose a background color:</Text>
-          <View style={styles.colorSelection}>
-              {/* BLACK */}
-              <Pressable
-                onPress={() => this.handleColorSelection(this.state.colors.black)}
-                style={styles.colorSelectionSize}
-              >
-                <View 
-                  style={[styles.black, (this.state.colors.black === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
-                />
-              </Pressable>
-              
-              {/* PURPLE */}
-              <Pressable
-                onPress={() => this.handleColorSelection(this.state.colors.purple)}
-                style={styles.colorSelectionSize}
-              >
-                <View
-                  style={[styles.purple, (this.state.colors.purple === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
-                />
-              </Pressable>
-              
-              <Pressable
-                onPress={() => this.handleColorSelection(this.state.colors.green)}
-                style={styles.colorSelectionSize}
-              >
-                <View
-                  style={[styles.green, (this.state.colors.green === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
-                />
-              </Pressable>
-              
-              <Pressable
-                onPress={() => this.handleColorSelection(this.state.colors.blue)}
-                style={styles.colorSelectionSize}
-              >
-                <View
-                  style={[styles.blue, (this.state.colors.blue === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
-                />
-              </Pressable>
+          {/* input */}
+          <View
+            style={styles.main}>
+            <Text style={styles.title}>
+              Chat
+            </Text>
           </View>
-        </View>
-        
-        {/* Go to Chat Button */}
+          {/* call to action */}
+          <View style={styles.containerCta}>
+          <TextInput 
+            placeholder='Your Name'
+            style={styles.input}
+            onChangeText={(text) => this.setState({name: text})}
+          />
+          {/* color selction */}
+          <View style={styles.colorSelectionContainer}>
+            <Text style={styles.colorSelectionTitle}>Choose a background color:</Text>
+            <View style={styles.colorSelection}>
+                {/* BLACK */}
+                <Pressable
+                  onPress={() => this.handleColorSelection(this.state.colors.black)}
+                  style={styles.colorSelectionSize}
+                >
+                  <View 
+                    style={[styles.black, (this.state.colors.black === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
+                  />
+                </Pressable>
+                
+                {/* PURPLE */}
+                <Pressable
+                  onPress={() => this.handleColorSelection(this.state.colors.purple)}
+                  style={styles.colorSelectionSize}
+                >
+                  <View
+                    style={[styles.purple, (this.state.colors.purple === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
+                  />
+                </Pressable>
+                
+                <Pressable
+                  onPress={() => this.handleColorSelection(this.state.colors.green)}
+                  style={styles.colorSelectionSize}
+                >
+                  <View
+                    style={[styles.green, (this.state.colors.green === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
+                  />
+                </Pressable>
+                
+                <Pressable
+                  onPress={() => this.handleColorSelection(this.state.colors.blue)}
+                  style={styles.colorSelectionSize}
+                >
+                  <View
+                    style={[styles.blue, (this.state.colors.blue === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
+                  />
+                </Pressable>
+            </View>
+          </View>
+          {/* Go to Chat Button */}
           <View style={styles.cta}>
             <Pressable
               style={styles.button}
@@ -96,7 +95,7 @@ class Start extends Component {
                 }
               }>
                 <Text
-                style={styles.text}
+                style={styles.buttonText}
                 >Go to Chat
               </Text>
             </Pressable>
@@ -104,7 +103,7 @@ class Start extends Component {
         </View>
         
       </ImageBackground>
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 }
@@ -141,7 +140,7 @@ const styles = StyleSheet.create({
       width:-6,
       height:8
     },
-    borderRadius:22
+    borderRadius:3
   },
   container: {
     flex:1,
@@ -165,12 +164,13 @@ const styles = StyleSheet.create({
   // button text
   text:{
     textAlign:'center',
-    color:'rgb(255, 255, 255)',
+    color:'#FFFFFF',
     fontSize:35
   },
   title:{
-    color:'white',
-    fontSize: 56
+    color:'#FFFFFF',
+    fontSize: 45,
+    fontWeight: '600'
   },
   input:{
     padding:10,
@@ -178,7 +178,11 @@ const styles = StyleSheet.create({
     borderColor:'black',
     borderRadius:5,
     backgroundColor:'white',
-    height:50
+    height:50,
+    fontSize:16,
+    fontWeight: '300',
+    color: '#757083',
+    opacity: .5
   },
   image: {
     flex:1,
@@ -193,6 +197,18 @@ const styles = StyleSheet.create({
     padding:10,
     borderRadius:10
   },
+  buttonText:{
+    textAlign:'center',
+    fontSize:16,
+    fontWeight: '600',
+    color: '#FFFFFF'
+  },
+  colorSelectionTitle:{
+    fontSize: 16,
+    fontWeight: '300',
+    color: '#757083',
+    opacity:1
+  },
   colorSelectionSize:{
     width:40,
     height:40,
@@ -206,15 +222,15 @@ const styles = StyleSheet.create({
     borderWidth:6,
   },
   black :{
-    backgroundColor: '#0F120E',
+    backgroundColor: '#090C08',
   },
   purple :{
-    backgroundColor: '#757082',
+    backgroundColor: '#474056',
   },
   green :{
-    backgroundColor: '#B8C6AE',
+    backgroundColor: '#8A95A5',
   },
   blue :{
-    backgroundColor: '#637380',
+    backgroundColor: '#B9C6AE',
   }
 });
