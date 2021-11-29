@@ -32,7 +32,6 @@ class Start extends Component {
         <View style={styles.main}>
           <Text style={styles.title}>
             Chat
-            {this.state.color}
           </Text>
         </View>
         {/* call to action */}
@@ -43,25 +42,27 @@ class Start extends Component {
           onChangeText={(text) => this.setState({name: text})}
         />
         
-        
         {/* color selction */}
         <View style={styles.colorSelectionContainer}>
           <Text>Choose a background color:</Text>
           <View style={styles.colorSelection}>
+              {/* BLACK */}
               <Pressable
                 onPress={() => this.handleColorSelection(this.state.colors.black)}
                 style={styles.colorSelectionSize}
               >
                 <View 
-                  style={[styles.black, styles.colorSelectionSize]}
+                  style={[styles.black, (this.state.colors.black === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
                 />
               </Pressable>
+              
+              {/* PURPLE */}
               <Pressable
                 onPress={() => this.handleColorSelection(this.state.colors.purple)}
                 style={styles.colorSelectionSize}
               >
                 <View
-                  style={[styles.purple, styles.colorSelectionSize]}
+                  style={[styles.purple, (this.state.colors.purple === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
                 />
               </Pressable>
               
@@ -70,7 +71,7 @@ class Start extends Component {
                 style={styles.colorSelectionSize}
               >
                 <View
-                  style={[styles.green, styles.colorSelectionSize]}
+                  style={[styles.green, (this.state.colors.green === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
                 />
               </Pressable>
               
@@ -79,7 +80,7 @@ class Start extends Component {
                 style={styles.colorSelectionSize}
               >
                 <View
-                  style={[styles.blue, styles.colorSelectionSize]}
+                  style={[styles.blue, (this.state.colors.blue === this.state.color ? styles.colorSelectionSizeActive : styles.colorSelectionSize )]}
                 />
               </Pressable>
           </View>
@@ -195,7 +196,14 @@ const styles = StyleSheet.create({
   colorSelectionSize:{
     width:40,
     height:40,
-    borderRadius: 50
+    borderRadius: 20
+  },
+  colorSelectionSizeActive:{
+    width:40,
+    height:40,
+    borderRadius: 50,
+    borderColor:'lightblue',
+    borderWidth:6,
   },
   black :{
     backgroundColor: '#0F120E',
