@@ -1,13 +1,33 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
+// React native routing
+import 'react-native-gesture-handler'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
 import { StyleSheet, Text, View } from 'react-native';
-
+// components
+import Start from './componets/Start'
+import Chat from './componets/Chat'
+// create the navigator
+const Stack = createStackNavigator()
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName='Start'
+      >
+        <Stack.Screen
+          name='Start'
+          component={Start}
+        />
+        <Stack.Screen
+          name='Chat'
+          component={Chat}
+        />
+        
+      
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
