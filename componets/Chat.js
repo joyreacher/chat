@@ -1,23 +1,32 @@
 import React, { Component } from 'react';
 
 // react native specific components
-import { StyleSheet, Text, View, Button, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Pressable } from 'react-native';
+
+/* 
+  Application chat screen: Displays the selected background color along with the users name
+  entered on the Start.js screen
+*/
 class Chat extends Component {
   constructor(props){
     super()
   }
+  // Set the page title once Chat is loaded
+  componentDidMount() {
+    let { name } = this.props.route.params
+    // Add the name to top of screen
+    // ! setOptions needs to be in component did mount to avoid console errors
+    this.props.navigation.setOptions({ title: name })
+  }
   render() {
-    // name holds the name value from the route prop/hook
+    // store the prop values that are passed
     let { name, color } = this.props.route.params
     // Add the name to top of screen
-    this.props.navigation.setOptions({ title: name})
-    
     return (
       <View style={[{backgroundColor: color}, styles.container]}>
         <View style={styles.main}>
           <Text style={styles.title}>CHAT</Text>
         </View>
-        
         <View style={styles.main}>
           <View style={styles.responseContainer}>
             <Text style={styles.text}>
@@ -38,8 +47,6 @@ class Chat extends Component {
             </Pressable>
           </View>
         </View>
-        
-        
       </View>
     );
   }
