@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, TextInput, Pressable, KeyboardAvoidingView} from 'react-native';
 // background image
 const image = require('../assets/project_assets/bg.png')
+
+/* 
+  Application start screen: User can enter their name and select a background color to set the
+    theme of the UI.
+*/
 class Start extends Component {
   constructor(props){
     super(props)
@@ -16,6 +21,9 @@ class Start extends Component {
       }
     }
   }
+  /** handleColorSelection(color) takes a color hex value and sets the
+    empty color state to pass to Chat.js
+   */
   handleColorSelection = (colorSelection) => {
     return this.setState({color:colorSelection})  
   }
