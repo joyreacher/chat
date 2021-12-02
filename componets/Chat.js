@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 // react native specific components
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView } from 'react-native';
 
 // Gifted chat
 import { GiftedChat } from 'react-native-gifted-chat'
@@ -51,12 +51,17 @@ class Chat extends Component {
     // store the prop values that are passed
     let { name, color } = this.props.route.params
     return (
-      <GiftedChat
+      <View>
+        <GiftedChat
         messages={this.state.messages}
         onSend={messages => this.onSend(messages)}
         user={{
           _id:1
         }} />
+        {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
+        { Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
+      </View>
+      
     )
   }
 }
