@@ -51,7 +51,7 @@ class Chat extends Component {
     // store the prop values that are passed
     let { name, color } = this.props.route.params
     return (
-      <View>
+      <View style={view.outer}>
         <GiftedChat
         messages={this.state.messages}
         onSend={messages => this.onSend(messages)}
@@ -68,4 +68,12 @@ class Chat extends Component {
 
 export default Chat;
 
-const styles = StyleSheet.create({});
+/**
+ * Styles follow component names
+ */
+const view = StyleSheet.create({
+  outer:{
+    flex:1
+  }
+});
+const giftedChat = StyleSheet.create({});
