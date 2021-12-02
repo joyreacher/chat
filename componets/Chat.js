@@ -22,6 +22,11 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat'
    * @name Chat
    * @summary Application chat screen: Displays the selected background color along with the users name
    *          entered on the Start.js screen
+   *
+   * @name onSend(props)
+   * @summary Used to send/add messages to messages state
+   * @param string
+   * @returns string
 */
 class Chat extends Component {
   constructor (props) {
@@ -84,6 +89,11 @@ class Chat extends Component {
     )
   }
 
+  onSend(messages = []){
+    this.setState(previousState => ({
+      messages: GiftedChat.append(previousState.messages, messages)
+    }))
+  }
   render () {
     // store the prop values that are passed
     const { name, color } = this.props.route.params
