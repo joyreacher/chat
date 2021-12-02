@@ -38,7 +38,7 @@ class Chat extends Component {
   }
 
   componentDidMount () {
-    const { name } = this.props.route.params
+    const { name, color, contrastColor } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     /**
       When using Gifted Chat, each message needs to have an ID, creation date, and user object
@@ -69,19 +69,25 @@ class Chat extends Component {
   }
 
   renderBubble (props) {
-    const { color } = this.props.route.params
+    const { color, contrastColor } = this.props.route.params
     return (
       <Bubble
         {...props}
         textStyle={{
           left: {
-            color: color
+            color: '#FFFFFF'
+          },
+          right: {
+            color: '#FFFFFF'
           }
         }}
         wrapperStyle={
         {
           left: {
             backgroundColor: '#000'
+          },
+          right: {
+            backgroundColor: `hsl(${contrastColor})`
           }
         }
       }
