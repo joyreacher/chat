@@ -53,7 +53,7 @@ class Chat extends Component {
         },
           {
             _id: 2,
-            text: 'Hello ' + name,
+            text: 'Hello ' + name + ' you are now chatting.',
             createAt: new Date(),
             // Make this message appear in the middle of the chat screen
             system: true
@@ -86,7 +86,7 @@ class Chat extends Component {
     // store the prop values that are passed
     let { name, color } = this.props.route.params
     return (
-      <View style={view.outer}>
+      <View style={[{backgroundColor:color },view.outer]}>
         <GiftedChat
         // Add the prop necessary to change the bubble color
         renderBubble={this.renderBubble.bind(this)}
