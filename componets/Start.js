@@ -12,7 +12,9 @@ class Start extends Component {
     super(props)
     this.state = {
       name:'',
-      color:'',
+      color:'#FFFFFF',
+      contrastColor:'100, 18%, 15%',
+      textColor:'0, 0, 100',
       colors: {
         black:'#090C08',
         purple:'#474056',
@@ -21,11 +23,23 @@ class Start extends Component {
       }
     }
   }
-  /** handleColorSelection(color) takes a color hex value and sets the
-    empty color state to pass to Chat.js
+  /** 
+    - handleColorSelection(color) takes a color hex value and sets the
+      empty color state to pass to Chat.js
+    - Sets bubble color of user's messages in the Chat screen
+    - Overrides the default state
    */
   handleColorSelection = (colorSelection) => {
-    return this.setState({color:colorSelection})  
+    switch (colorSelection){
+      case this.state.colors.black:
+        return this.setState({color: colorSelection, contrastColor: '100, 18%, 43%', textColor: '0, 0%, 100%'})
+      case this.state.colors.purple:
+        return this.setState({color: colorSelection, contrastColor: '259, 15%, 50%', textColor: '0, 0%, 100%'})
+      case this.state.colors.green:
+        return this.setState({color: colorSelection, contrastColor: '216, 13%, 18%', textColor: '0, 0%, 100%'})
+      case this.state.colors.blue:
+        return this.setState({color: colorSelection, contrastColor: '93, 17%, 28%', textColor: '0, 0%, 100%'})
+    }
   }
 
   render() {
@@ -98,8 +112,8 @@ class Start extends Component {
             <Pressable
               style={styles.button}
               onPress={() => {
-                // Send name and color state as props to chat
-                this.props.navigation.navigate('Chat', {name: this.state.name, color: this.state.color})
+                // Send name and color state as props to chat - Send Contrast color state for user's message bubbles
+                this.props.navigation.navigate('Chat', {name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor, textColor: this.state.textColor})
                 }
               }>
                 <Text
@@ -230,7 +244,7 @@ const styles = StyleSheet.create({
     borderWidth:6,
   },
   black :{
-    backgroundColor: '#090C08',
+    backgroundColor: 'hsl(105, 20%, 4%)',
   },
   purple :{
     backgroundColor: '#474056',

@@ -22,6 +22,11 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat'
    * @name Chat
    * @summary Application chat screen: Displays the selected background color along with the users name
    *          entered on the Start.js screen
+   *
+   * @name onSend(props)
+   * @summary Used to send/add messages to messages state
+   * @param string
+   * @returns string
 */
 class Chat extends Component {
   constructor (props) {
@@ -33,7 +38,7 @@ class Chat extends Component {
   }
 
   componentDidMount () {
-    const { name } = this.props.route.params
+    const { name, color, contrastColor, textColor } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     /**
       When using Gifted Chat, each message needs to have an ID, creation date, and user object
@@ -44,7 +49,7 @@ class Chat extends Component {
       messages: [
         {
           _id: 1,
-          text: 'Hello ' + name,
+          text: 'Hello ' + textColor,
           createdAt: new Date(),
           user: {
             _id: 2,
@@ -64,19 +69,25 @@ class Chat extends Component {
   }
 
   renderBubble (props) {
-    const { color } = this.props.route.params
+    const { color, contrastColor, textColor } = this.props.route.params
     return (
       <Bubble
         {...props}
         textStyle={{
           left: {
-            color: color
+            color: `hsl(${textColor})`
+          },
+          right: {
+            color: `hsl(${textColor})`
           }
         }}
         wrapperStyle={
         {
           left: {
             backgroundColor: '#000'
+          },
+          right: {
+            backgroundColor: `hsl(${contrastColor})`
           }
         }
       }
@@ -84,6 +95,11 @@ class Chat extends Component {
     )
   }
 
+  onSend(messages = []){
+    this.setState(previousState => ({
+      messages: GiftedChat.append(previousState.messages, messages)
+    }))
+  }
   render () {
     // store the prop values that are passed
     const { name, color } = this.props.route.params
@@ -116,4 +132,3 @@ const view = StyleSheet.create({
     flex: 1
   }
 })
-const giftedChat = StyleSheet.create({})
