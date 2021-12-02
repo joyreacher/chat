@@ -33,16 +33,25 @@ class Chat extends Component {
       More https://github.com/FaridSafi/react-native-gifted-chat
      */
     this.setState({
-      messages:[{
-        _id:1,
-        text: 'Hello Developer',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any'
-        }
-      }]
+      messages:[
+          {
+          _id:1,
+          text: 'Hello Developer',
+          createdAt: new Date(),
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://placeimg.com/140/140/any'
+          }
+        },
+          {
+            _id: 2,
+            text: 'This is a system message',
+            createAt: new Date(),
+            // Make this message appear in the middle of the chat screen
+            system: true
+          }
+      ]
     })
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
