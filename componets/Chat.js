@@ -4,11 +4,16 @@ import React, { Component } from 'react';
 import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView } from 'react-native';
 
 // Gifted chat
-import { GiftedChat } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble } from 'react-native-gifted-chat'
 
-/* 
-  Application chat screen: Displays the selected background color along with the users name
-  entered on the Start.js screen
+/**
+   * @name renderBubble(props)
+   * @summary Takes props given from the start screen
+   * 
+   * @param string
+   * @returns string
+   * Application chat screen: Displays the selected background color along with the users name
+      entered on the Start.js screen
 */
 class Chat extends Component {
   constructor(props){
@@ -56,12 +61,35 @@ class Chat extends Component {
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
   }
+
+  renderBubble(props) {
+    return(
+      <Bubble
+      {...props}
+      textStyle={{
+        left: {
+          color: 'yellow'
+        }
+      }}
+      wrapperStyle={
+        {
+          left: {
+            backgroundColor: '#000'
+          }
+        }
+      }
+      />
+    )
+  }
+
   render() {
     // store the prop values that are passed
     let { name, color } = this.props.route.params
     return (
       <View style={view.outer}>
         <GiftedChat
+        // Add the prop necessary to change the bubble color
+        renderBubble={this.renderBubble.bind(this)}
         messages={this.state.messages}
         onSend={messages => this.onSend(messages)}
         user={{
