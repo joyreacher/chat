@@ -32,6 +32,8 @@ class Chat extends Component {
       !IMPORTANT setOptions needs to be in component did mount to avoid console errors
   */
   componentDidMount() {
+    const { name } = this.props.route.params
+    this.props.navigation.setOptions({ title: name })
     /**
       When using Gifted Chat, each message needs to have an ID, creation date, and user object
       The user object requires user ID, name, and avatar.
@@ -41,7 +43,7 @@ class Chat extends Component {
       messages:[
           {
           _id:1,
-          text: 'Hello Developer',
+          text: 'Hello ' + name,
           createdAt: new Date(),
           user: {
             _id: 2,
@@ -51,15 +53,13 @@ class Chat extends Component {
         },
           {
             _id: 2,
-            text: 'This is a system message',
+            text: 'Hello ' + name,
             createAt: new Date(),
             // Make this message appear in the middle of the chat screen
             system: true
           }
       ]
     })
-    const { name } = this.props.route.params
-    this.props.navigation.setOptions({ title: name })
   }
 
   renderBubble(props) {
