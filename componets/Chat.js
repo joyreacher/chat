@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 // react native specific components
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 
+// Gifted chat
+import { GiftedChat } from 'react-native-gifted-chat'
+
 /* 
   Application chat screen: Displays the selected background color along with the users name
   entered on the Start.js screen
@@ -10,12 +13,18 @@ import { StyleSheet, Text, View, Pressable } from 'react-native';
 class Chat extends Component {
   constructor(props){
     super()
+    this.state = {
+      messages: []
+    }
   }
-  // Set the page title once Chat is loaded
+  /* 
+    componentDidMount does 2 things:
+      1) Adds what the user types in the textbox to the top of the chat screen
+      2) Set the name variable with the same textbox value to use in render()
+      !IMPORTANT setOptions needs to be in component did mount to avoid console errors
+  */
   componentDidMount() {
-    let { name } = this.props.route.params
-    // Add the name to top of screen
-    // ! setOptions needs to be in component did mount to avoid console errors
+    const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
   }
   render() {
@@ -23,23 +32,26 @@ class Chat extends Component {
     let { name, color } = this.props.route.params
     return (
       <View style={[{backgroundColor: color}, styles.container]}>
+        {/* App Title */}
         <View style={styles.main}>
           <Text style={styles.title}>CHAT</Text>
         </View>
         <View style={styles.main}>
           <View style={styles.responseContainer}>
+            {/* Main Text */}
             <Text style={styles.text}>
               Hello <Text style={styles.data}>{name}</Text>,
               You Chose <Text style={styles.data}>{color}</Text> as your background.
             </Text>
           </View>
-          
+          {/* Go Back Button */}
           <View style={styles.main}>
             <Pressable
               style={styles.button}
               title='Go back'
-              // calls on the navigation's navigate prop.
-              // Navigates you to 'Start'
+              /**
+                Calls on the navigation's navigate prop to navigates you back to 'Start'
+               */
               onPress={() => this.props.navigation.navigate('Start')}
             >
             <Text style={styles.buttonText}>Go Back</Text>
