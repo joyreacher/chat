@@ -14,6 +14,7 @@ class Start extends Component {
       name:'',
       color:'#FFFFFF',
       contrastColor:'100, 18%, 15%',
+      textColor:'0, 0, 100',
       colors: {
         black:'#090C08',
         purple:'#474056',
@@ -31,13 +32,13 @@ class Start extends Component {
   handleColorSelection = (colorSelection) => {
     switch (colorSelection){
       case this.state.colors.black:
-        return this.setState({color: colorSelection, contrastColor: '100, 18%, 15%'})
+        return this.setState({color: colorSelection, contrastColor: '100, 18%, 43%', textColor: '0, 0%, 100%'})
       case this.state.colors.purple:
-        return this.setState({color: colorSelection, contrastColor: '259, 15%, 19%'})
+        return this.setState({color: colorSelection, contrastColor: '259, 15%, 50%', textColor: '0, 0%, 100%'})
       case this.state.colors.green:
-        return this.setState({color: colorSelection, contrastColor: '216, 13%, 49%'})
+        return this.setState({color: colorSelection, contrastColor: '216, 13%, 18%', textColor: '0, 0%, 100%'})
       case this.state.colors.blue:
-        return this.setState({color: colorSelection, contrastColor: '93, 17%, 63%'})
+        return this.setState({color: colorSelection, contrastColor: '93, 17%, 28%', textColor: '0, 0%, 100%'})
     }
   }
 
@@ -112,7 +113,7 @@ class Start extends Component {
               style={styles.button}
               onPress={() => {
                 // Send name and color state as props to chat - Send Contrast color state for user's message bubbles
-                this.props.navigation.navigate('Chat', {name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor})
+                this.props.navigation.navigate('Chat', {name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor, textColor: this.state.textColor})
                 }
               }>
                 <Text
