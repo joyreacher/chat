@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 // react native specific components
-import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView } from 'react-native'
 
 // Gifted chat
 import { GiftedChat, Bubble } from 'react-native-gifted-chat'
@@ -9,7 +9,7 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat'
 /**
    * CHAT SCREEN FUNCTIONS
    * =====================
-   * 
+   *
    * @name renderBubble(props)
    * @summary Takes props given from the start screen
    * @param string
@@ -24,14 +24,15 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat'
    *          entered on the Start.js screen
 */
 class Chat extends Component {
-  constructor(props){
+  constructor (props) {
     super()
     // Messages state initialized with empty array
     this.state = {
       messages: []
     }
   }
-  componentDidMount() {
+
+  componentDidMount () {
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     /**
@@ -40,9 +41,9 @@ class Chat extends Component {
       More https://github.com/FaridSafi/react-native-gifted-chat
      */
     this.setState({
-      messages:[
-          {
-          _id:1,
+      messages: [
+        {
+          _id: 1,
           text: 'Hello ' + name,
           createdAt: new Date(),
           user: {
@@ -51,28 +52,28 @@ class Chat extends Component {
             avatar: 'https://placeimg.com/140/140/any'
           }
         },
-          {
-            _id: 2,
-            text: 'Hello ' + name + ' you are now chatting.',
-            createAt: new Date(),
-            // Make this message appear in the middle of the chat screen
-            system: true
-          }
+        {
+          _id: 2,
+          text: 'Hello ' + name + ' you are now chatting.',
+          createAt: new Date(),
+          // Make this message appear in the middle of the chat screen
+          system: true
+        }
       ]
     })
   }
 
-  renderBubble(props) {
+  renderBubble (props) {
     const { color } = this.props.route.params
-    return(
+    return (
       <Bubble
-      {...props}
-      textStyle={{
-        left: {
-          color: color
-        }
-      }}
-      wrapperStyle={
+        {...props}
+        textStyle={{
+          left: {
+            color: color
+          }
+        }}
+        wrapperStyle={
         {
           left: {
             backgroundColor: '#000'
@@ -83,35 +84,36 @@ class Chat extends Component {
     )
   }
 
-  render() {
+  render () {
     // store the prop values that are passed
-    let { name, color } = this.props.route.params
+    const { name, color } = this.props.route.params
     return (
-      <View style={[{backgroundColor:color },view.outer]}>
+      <View style={[{ backgroundColor: color }, view.outer]}>
         <GiftedChat
         // Add the prop necessary to change the bubble color
-        renderBubble={this.renderBubble.bind(this)}
-        messages={this.state.messages}
-        onSend={messages => this.onSend(messages)}
-        user={{
-          _id:1
-        }} />
+          renderBubble={this.renderBubble.bind(this)}
+          messages={this.state.messages}
+          onSend={messages => this.onSend(messages)}
+          user={{
+            _id: 1
+          }}
+        />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
-        { Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
+        {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
       </View>
-      
+
     )
   }
 }
 
-export default Chat;
+export default Chat
 
 /**
  * Style variables follow component names
  */
 const view = StyleSheet.create({
-  outer:{
-    flex:1
+  outer: {
+    flex: 1
   }
-});
-const giftedChat = StyleSheet.create({});
+})
+const giftedChat = StyleSheet.create({})
