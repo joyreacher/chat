@@ -132,4 +132,3 @@ const view = StyleSheet.create({
     flex: 1
   }
 })
-const giftedChat = StyleSheet.create({})
