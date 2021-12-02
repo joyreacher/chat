@@ -21,7 +21,6 @@ class Chat extends Component {
   render() {
     // store the prop values that are passed
     let { name, color } = this.props.route.params
-    // Add the name to top of screen
     return (
       <View style={[{backgroundColor: color}, styles.container]}>
         <View style={styles.main}>
