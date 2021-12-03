@@ -49,7 +49,7 @@ class Chat extends Component {
       messages: [
         {
           _id: 1,
-          text: 'Hello ' + textColor,
+          text: 'Hello ' + name,
           createdAt: new Date(),
           user: {
             _id: 2,
