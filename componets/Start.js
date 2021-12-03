@@ -14,7 +14,7 @@ class Start extends Component {
       name:'',
       color:'#FFFFFF',
       contrastColor:'100, 18%, 15%',
-      textColor:'0, 0, 100',
+      textColor:'0, 0%, 100%',
       colors: {
         black:'#090C08',
         purple:'#474056',
@@ -61,7 +61,7 @@ class Start extends Component {
           <View style={styles.containerCta}>
           <TextInput 
             placeholder='Your Name'
-            style={styles.input}
+            style={[styles.input,{ borderColor: !this.state.contrastColor ? this.state.colors.black : `hsl(${this.state.contrastColor})` }]}
             onChangeText={(text) => this.setState({name: text})}
           />
           {/* color selction */}
@@ -110,7 +110,7 @@ class Start extends Component {
           {/* Go to Chat Button */}
           <View style={styles.cta}>
             <Pressable
-              style={styles.button}
+              style={[styles.button, {backgroundColor: this.state.color === '#FFFFFF' ? '#757082' : this.state.color}]}
               onPress={() => {
                 // Send name and color state as props to chat - Send Contrast color state for user's message bubbles
                 this.props.navigation.navigate('Chat', {name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor, textColor: this.state.textColor})
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     width:300,
     alignSelf:'center',
     padding:23,
-    backgroundColor:'white',
+    backgroundColor:'#FFFFFF',
     shadowOpacity:.5,
     shadowRadius:7,
     shadowColor:'black',
@@ -196,14 +196,11 @@ const styles = StyleSheet.create({
   },
   input:{
     padding:10,
-    borderWidth:1,
-    borderColor:'black',
+    borderWidth:2,
     borderRadius:5,
-    backgroundColor:'white',
     height:50,
     fontSize:16,
     fontWeight: '300',
-    color: '#757083',
     opacity: .5
   },
   image: {
@@ -215,7 +212,6 @@ const styles = StyleSheet.create({
   },
   button:{
     marginTop:50,
-    backgroundColor:'#757082',
     padding:10,
     borderRadius:10
   },
