@@ -30,7 +30,7 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat'
 */
 class Chat extends Component {
   constructor (props) {
-    super()
+    super(props)
     // Messages state initialized with empty array
     this.state = {
       messages: []
@@ -38,7 +38,7 @@ class Chat extends Component {
   }
 
   componentDidMount () {
-    const { name, color, contrastColor, textColor } = this.props.route.params
+    const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     /**
       When using Gifted Chat, each message needs to have an ID, creation date, and user object
@@ -69,7 +69,7 @@ class Chat extends Component {
   }
 
   renderBubble (props) {
-    const { color, contrastColor, textColor } = this.props.route.params
+    const { contrastColor, textColor } = this.props.route.params
     return (
       <Bubble
         {...props}
