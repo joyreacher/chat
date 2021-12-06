@@ -7,32 +7,10 @@ import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView } from 'rea
 import { GiftedChat, Bubble } from 'react-native-gifted-chat'
 
 // Firebase
-// const firebase = require('firebase')
 import * as firebase from 'firebase'
 require('firebase/firestore')
 
-/**
-   * CHAT SCREEN FUNCTIONS
-   * =====================
-   *
-   * @name renderBubble(props)
-   * @summary Takes props given from the start screen
-   * @param string
-   * @returns string
-   *
-   * @name componentDidMount()
-   * @summary Adds what the user types in the textbox to the top of the chat screen
-   *          Set the name variable with the same textbox value to use in render()
-   *
-   * @name Chat
-   * @summary Application chat screen: Displays the selected background color along with the users name
-   *          entered on the Start.js screen
-   *
-   * @name onSend(props)
-   * @summary Used to send/add messages to messages state
-   * @param string
-   * @returns string
-*/
+
 // Config for chat-app
 const firebaseConfig = {
   apiKey: "AIzaSyAkoN3FsqSE-AWET9Mz2VvH38fhlBMoeyg",
@@ -52,90 +30,86 @@ if(!firebase.apps.length){
 class Chat extends Component {
   constructor (props) {
     super(props)
-    // Messages state initialized with empty array
     this.state = {
-      messages: []
+      messages: [],
+      user: {
+        _id: null,
+        name: '',
+        avatar:''
+      }
     }
   }
   // Pull message data
   onCollectionUpdate = (querySnapShot) => {
-    const messages = []
+    const { name } = this.props.route.params
+    // Message array always set with system message
+    const messages = [
+      {
+        
+        _id: 2,
+        text: 'Hello ' + name + ' you are now chatting.',
+        createAt: new Date(),
+        // Make this message appear in the middle of the chat screen
+        system: true
+      
+      }
+    ]
     // go through each document
     querySnapShot.forEach((doc) => {
       // get data
-      
-      // format date
       let data = doc.data()
+      // format date
       let date = new Date(data.createdAt.seconds * 1000).toLocaleDateString('en-US')
-      messages.push({
-        _id: data.uid,
+      messages.push(
+        {
+        uid: data.uid,
         text:data.text,
         createdAt: date ,
+        // Mock user
         user: {
           _id: 2,
-          name: 'React Native',
+          name: 'Brian',
           avatar: 'https://placeimg.com/140/140/any'
+          }
         }
-      })
+      )
     })
     this.setState({
       messages,
     }) 
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
-    
     // Setup Firebase auth() to sign users in Anonymously
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
       if(!message){
         await firebase.auth().signInAnonymously()
       }
+      // Set the user using Anonymous sign in and props
+      this.setState({
+        user:{
+          _id: message.uid,
+          name: name,
+          avatar: 'https://placeimg.com/140/140/any'
+        }
+      })
+      // Observe the users message by uid
       
-      // Reference the users message by uid
-      this.referenceMessagesUser = firebase.firestore().collection('messages')
+      // this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
+      this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
       
       // Calls the onSnapShot 
       this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)  
     })
-
-    this.referenceMessagesUser = firebase.firestore().collection('messages')
-    
-    
-    // this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)  
-    
-    /**
-      When using Gifted Chat, each message needs to have an ID, creation date, and user object
-      The user object requires user ID, name, and avatar.
-      More https://github.com/FaridSafi/react-native-gifted-chat
-     */
-    // this.setState({
-    //   messages: [
-    //     {
-    //       _id: 1,
-    //       text: 'Hello ' + this.state.text,
-    //       createdAt: new Date(),
-    //       user: {
-    //         _id: 2,
-    //         name: 'React Native',
-    //         avatar: 'https://placeimg.com/140/140/any'
-    //       }
-    //     },
-    //     {
-    //       _id: 2,
-    //       text: 'Hello ' + name + ' you are now chatting.',
-    //       createAt: new Date(),
-    //       // Make this message appear in the middle of the chat screen
-    //       system: true
-    //     }
-    //   ]
-    // })
+    this.referenceMessages = firebase.firestore().collection('messages')
   }
 
   componentWillUnmount() {
-    // Point to the snapShot
+    // Stop listening to authentication and collection changes
     this.unsubscribeMessagesUser
+    this.referenceMessages
   }
 
   renderBubble (props) {
@@ -165,15 +139,28 @@ class Chat extends Component {
     )
   }
 
-  onSend(messages = []){
+  async onSend(messages = []){
+    // Adds user messages (right side)
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages)
     }))
-    console.log('line 176')
-    console.log(messages[0]._id)
-    this.referenceMessagesUser.add({
+    // Write to Firebase
+    /**
+      {
+        uid: number
+        text: string
+        createdAt: timestamp
+        user: user state object
+          {
+            _id: number
+            name: string
+            avatar: string
+          }
+      }
+     */
+    await this.referenceMessages.add({
       uid: messages[0]._id,
-      user:messages[0].user,
+      user:this.state.user,
       text:messages[0].text ,
       createdAt: new Date()
     })
