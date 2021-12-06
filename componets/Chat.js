@@ -66,7 +66,6 @@ class Chat extends Component {
       
       // format date
       let data = doc.data()
-      console.log(data)
       let date = new Date(data.createdAt.seconds * 1000).toLocaleDateString('en-US')
       messages.push({
         _id: data.uid,
@@ -171,7 +170,13 @@ class Chat extends Component {
       messages: GiftedChat.append(previousState.messages, messages)
     }))
     console.log('line 176')
-    console.log(messages)
+    console.log(messages[0]._id)
+    this.referenceMessagesUser.add({
+      uid: messages[0]._id,
+      user:messages[0].user,
+      text:messages[0].text ,
+      createdAt: new Date()
+    })
   }
   render () {
     // store the prop values that are passed
@@ -184,7 +189,9 @@ class Chat extends Component {
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           user={{
-            _id: 1
+            _id: 1,
+            name: name,
+            avatar: 'avatar value on 194'
           }}
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
