@@ -10,6 +10,8 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat'
 import * as firebase from 'firebase'
 require('firebase/firestore')
 
+// AsyncStorage
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // Config for chat-app
 const firebaseConfig = {
@@ -75,7 +77,21 @@ class Chat extends Component {
     }) 
   }
 
+  async getMessages(){
+    let messages = ''
+    try{
+      messages = await AsyncStorage.getItem('messages') || []
+      this.setState({
+        messages: JSON.parse(messages)
+      })
+    }catch(e){
+      console.log('getMessages() errorr')
+      console.log(e.messages)
+    }
+  }
+
   componentDidMount (messages = []) {
+    this.getMessages()
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     
