@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView } from 'react-native'
 
 // Gifted chat
-import { GiftedChat, Bubble } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
 
 // Firebase
 import * as firebase from 'firebase'
@@ -39,7 +39,7 @@ class Chat extends Component {
     super(props)
     this.state = {
       messages: [],
-      isConnected: null,
+      isConnected: '',
       user: {
         _id: null,
         name: '',
@@ -100,8 +100,8 @@ class Chat extends Component {
     this.getMessages()
     NetInfo.fetch().then(connection => {
       if(connection.isConnected){
-        this.setState({
-          isConnected: false
+        return this.setState({
+          isConnected: true
         })
       } else {
         this.setState({
@@ -113,7 +113,7 @@ class Chat extends Component {
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     
-    if(!this.state.isConnected){
+    if(this.state.isConnected){
       console.log('is connected is false')
       return this.setState({
         messages,
@@ -208,41 +208,36 @@ class Chat extends Component {
   }
 
   async onSend(messages = []){
-    NetInfo.fetch().then(async connection => {
-      if (connection.isConnected) {
-        console.log('onSend - online')
-        // Adds user messages (right side)
-        // Stores messages in local storage
-        this.setState(previousState => ({
-          messages: GiftedChat.append(previousState.messages, messages)
-        }), () => { this.saveMessages() })
-        // Write to Firebase
-        /**
+    if(this.state.isConnected !== true){
+      return
+    }
+    // Adds user messages (right side)
+    // Stores messages in local storage
+    this.setState(previousState => ({
+      messages: GiftedChat.append(previousState.messages, messages)
+    }), () => { this.saveMessages() })
+    // Write to Firebase
+    /**
+      {
+        uid: number
+        text: string
+        createdAt: timestamp
+        user: user state object
           {
-            uid: number
-            text: string
-            createdAt: timestamp
-            user: user state object
-              {
-                _id: number
-                name: string
-                avatar: string
-              }
+            _id: number
+            name: string
+            avatar: string
           }
-         */
-        // Sets the message to the user sends
-        await this.referenceMessages.add({
-          // set uid to reference a user's message
-          uid: this.state.user._id,
-          _id: messages[0]._id,
-          user: this.state.user,
-          text: messages[0].text,
-          createdAt: messages[0].createdAt
-        })
-      } else {
-        console.log('You are offline')
-        return
       }
+     */
+    // Sets the message to the user sends
+    await this.referenceMessages.add({
+      // set uid to reference a user's message
+      uid: this.state.user._id,
+      _id: messages[0]._id,
+      user: this.state.user,
+      text: messages[0].text,
+      createdAt: messages[0].createdAt
     })
   }
   render () {
@@ -258,6 +253,7 @@ class Chat extends Component {
           user={
             this.state.user
           }
+          renderInputToolbar={messages => this.renderInputToolBar(messages)}
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
