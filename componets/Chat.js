@@ -32,6 +32,7 @@ class Chat extends Component {
     super(props)
     this.state = {
       messages: [],
+      myMessages:[],
       user: {
         _id: null,
         name: '',
@@ -42,19 +43,15 @@ class Chat extends Component {
   // Pull message data
   onCollectionUpdate = (querySnapShot) => {
     const { name } = this.props.route.params
-    let messages = []
-    // Message array always set with system message
-    if(!messages[0]){
-      messages = [
-        {
-          _id: 2,
-          text: 'Hello ' + name + ' you are now chatting.',
-          createAt: new Date(),
-          // Make this message appear in the middle of the chat screen
-          system: true
-        }
-      ]
-    }
+    let messages = [
+      {
+        _id: 2,
+        text: 'Hello ' + name + ' you are now chatting.',
+        createAt: new Date(),
+        // Make this message appear in the middle of the chat screen
+        system: true
+      }
+    ]
     
     // go through each document
     querySnapShot.forEach((doc) => {
@@ -64,30 +61,32 @@ class Chat extends Component {
       let date = new Date(data.createdAt.seconds * 1000).toLocaleDateString('en-US')
       messages.push(
         {
-          // uid:null,
+          uid: data.uid,
           _id: data._id,
-          text: 'Hello ' + name,
+          text: data.text,
           createdAt: date,
           user: {
-            _id: 2,
-            name: 'React Native',
-            avatar: 'https://placeimg.com/140/140/any'
+            _id: data.user._id,
+            name: data.user.name,
+            avatar: data.user.avatar
           }
         },
       )
     })
-    this.setState({
+    return this.setState({
       messages,
     }) 
+    console.log(this.state.messages)
   }
 
-  componentDidMount () {
+  componentDidMount (messages = []) {
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
+    
     // Setup Firebase auth() to sign users in Anonymously
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
       if (!message) {
-        await firebase.auth().signInAnonymously()
+        return await firebase.auth().signInAnonymously()
       }
       // Set the user using Anonymous sign in and props
       this.setState({
@@ -98,13 +97,53 @@ class Chat extends Component {
         }
       })
       // Observe the users message by uid
-      this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
-      // // Calls the onSnapShot 
-      this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
+      // this.referenceMessagesUser = firebase.firestore().collection('messages')
+      // // // // Calls the onSnapShot 
+      // this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
+      
+      // const messageRef = firebase.firestore().collection('messages')
+      // this.unsubscribeMessagesUser = messageRef.onSnapshot(this.onCollectionUpdate)
+      // const snapshot = await messageRef.where('uid', '==', message.uid).get()
+      // if(snapshot.empty){
+      //   console.log('No matching documents')
+      //   return;
+      // }
+      // snapshot.forEach(doc =>{
+      //   let data = doc.data()
+      //   // console.log(doc.id, '=>', doc.data().text)
+      //   console.log(doc.data().text)
+      //   console.log(this.state.messages)
+        
+      //   if(doc.id === this.state.user._id){
+      //     messages.push(
+      //       {
+      //         uid: data.uid,
+      //         _id: data._id,
+      //         text: data.text,
+      //         createdAt: date,
+      //         user: {
+      //           _id: data.user._id,
+      //           name: data.user.name,
+      //           avatar: data.user.avatar
+      //         }
+      //       },
+      //     )
+          
+      //     this.setState({
+      //       messages,
+      //     })
+      //   }
+        
+      // })
+      
+      
     })
+    
+    console.log(messages)
+    
     // Observe the users message by uid
     this.referenceMessages = firebase.firestore().collection('messages')
-    // this.unsubscribeMessages = this.referenceMessages.onSnapshot(this.onCollectionUpdate) 
+    this.unsubscribeMessages = this.referenceMessages.onSnapshot(this.onCollectionUpdate) 
   }
 
   componentWillUnmount() {
@@ -145,6 +184,16 @@ class Chat extends Component {
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages)
     }))
+    //! this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', this.state.user._id)
+      // // // Calls the onSnapShot 
+    //! this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
+    
+    
+    // const userMessagesRef = firebase.firestore().collection('messages')
+    
+    const messageRef = firebase.firestore().collection('messages')
+    this.unsubscribeMessagesUser = messageRef.onSnapshot(this.onCollectionUpdate)
+    const snapshot = await messageRef.where('uid', '==', this.state.user._id).get()
     // Write to Firebase
     /**
       {
@@ -159,9 +208,9 @@ class Chat extends Component {
           }
       }
      */
-    await this.referenceMessages.add({
+    await messageRef.add({
       // set uid to reference a user's message
-      // uid: this.state.user._id,
+      uid: this.state.user._id,
       _id: messages[0]._id,
       user:this.state.user,
       text:messages[0].text ,
@@ -178,6 +227,9 @@ class Chat extends Component {
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
+          user={
+            this.state.user
+          }
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
