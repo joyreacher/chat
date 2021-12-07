@@ -6,6 +6,9 @@ const image = require('../assets/project_assets/bg.png')
 /* 
   Application start screen: User can enter their name and select a background color to set the
     theme of the UI.
+  Removing AsyncStorage error
+  on line 648 change require path in index.rn.cjs (chat/node_modules/@firebase/app/dist/index.rn.cjs.js)
+  point it to @react-native-async-storage/async-storage
 */
 class Start extends Component {
   constructor(props){
