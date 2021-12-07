@@ -32,11 +32,14 @@ if(!firebase.apps.length){
   firebase.initializeApp(firebaseConfig)
 }
 
+// Check users internet connection using NetINfo
+
 class Chat extends Component {
   constructor (props) {
     super(props)
     this.state = {
       messages: [],
+      isConnected: null,
       user: {
         _id: null,
         name: '',
@@ -95,18 +98,27 @@ class Chat extends Component {
 
   componentDidMount (messages = []) {
     this.getMessages()
-    const { name } = this.props.route.params
-    this.props.navigation.setOptions({ title: name })
-    
-    // Check users internet connection using NetINfo
     NetInfo.fetch().then(connection => {
       if(connection.isConnected){
-        console.log('online')
+        this.setState({
+          isConnected: false
+        })
       } else {
-        console.log('offline')
+        this.setState({
+          isConnected: false
+        })
         return
       }
     })
+    const { name } = this.props.route.params
+    this.props.navigation.setOptions({ title: name })
+    
+    if(!this.state.isConnected){
+      console.log('is connected is false')
+      return this.setState({
+        messages,
+      }) 
+    }
 
     // Setup Firebase auth() to sign users in Anonymously
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
@@ -162,6 +174,17 @@ class Chat extends Component {
       }
       />
     )
+  }
+  renderInputToolBar(props){
+    if (this.state.isConnected === false){
+      
+    } else {
+      return(
+        <InputToolbar 
+          {...props}
+        />
+      )
+    }
   }
   // Function deletes message data saved to AsyncStorage as a string
   async deleteMessages(){
