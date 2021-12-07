@@ -13,6 +13,9 @@ require('firebase/firestore')
 // AsyncStorage
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+// NetInfo
+import NetInfo from '@react-native-community/netinfo'
+
 // Config for chat-app
 const firebaseConfig = {
   apiKey: "AIzaSyAkoN3FsqSE-AWET9Mz2VvH38fhlBMoeyg",
@@ -95,6 +98,16 @@ class Chat extends Component {
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     
+    // Check users internet connection using NetINfo
+    NetInfo.fetch().then(connection => {
+      if(connection.isConnected){
+        console.log('online')
+      } else {
+        console.log('offline')
+        return
+      }
+    })
+
     // Setup Firebase auth() to sign users in Anonymously
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
       if (!message) {
@@ -172,32 +185,41 @@ class Chat extends Component {
   }
 
   async onSend(messages = []){
-    // Adds user messages (right side)
-    // Stores messages in local storage
-    this.setState(previousState => ({
-      messages: GiftedChat.append(previousState.messages, messages) }), () => { this.saveMessages() })
-    // Write to Firebase
-    /**
-      {
-        uid: number
-        text: string
-        createdAt: timestamp
-        user: user state object
+    NetInfo.fetch().then(async connection => {
+      if (connection.isConnected) {
+        console.log('onSend - online')
+        // Adds user messages (right side)
+        // Stores messages in local storage
+        this.setState(previousState => ({
+          messages: GiftedChat.append(previousState.messages, messages)
+        }), () => { this.saveMessages() })
+        // Write to Firebase
+        /**
           {
-            _id: number
-            name: string
-            avatar: string
+            uid: number
+            text: string
+            createdAt: timestamp
+            user: user state object
+              {
+                _id: number
+                name: string
+                avatar: string
+              }
           }
+         */
+        // Sets the message to the user sends
+        await this.referenceMessages.add({
+          // set uid to reference a user's message
+          uid: this.state.user._id,
+          _id: messages[0]._id,
+          user: this.state.user,
+          text: messages[0].text,
+          createdAt: messages[0].createdAt
+        })
+      } else {
+        console.log('You are offline')
+        return
       }
-     */
-    // Sets the message to the user sends
-    await this.referenceMessages.add({
-      // set uid to reference a user's message
-      uid: this.state.user._id,
-      _id: messages[0]._id,
-      user:this.state.user,
-      text:messages[0].text ,
-      createdAt: messages[0].createdAt
     })
   }
   render () {
