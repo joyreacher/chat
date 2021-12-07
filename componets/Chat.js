@@ -42,18 +42,20 @@ class Chat extends Component {
   // Pull message data
   onCollectionUpdate = (querySnapShot) => {
     const { name } = this.props.route.params
+    let messages = []
     // Message array always set with system message
-    const messages = [
-      {
-        
-        _id: 2,
-        text: 'Hello ' + name + ' you are now chatting.',
-        createAt: new Date(),
-        // Make this message appear in the middle of the chat screen
-        system: true
-      
-      }
-    ]
+    if(!messages[0]){
+      messages = [
+        {
+          _id: 2,
+          text: 'Hello ' + name + ' you are now chatting.',
+          createAt: new Date(),
+          // Make this message appear in the middle of the chat screen
+          system: true
+        }
+      ]
+    }
+    
     // go through each document
     querySnapShot.forEach((doc) => {
       // get data
@@ -62,16 +64,16 @@ class Chat extends Component {
       let date = new Date(data.createdAt.seconds * 1000).toLocaleDateString('en-US')
       messages.push(
         {
-        uid: data.uid,
-        text:data.text,
-        createdAt: date ,
-        // Mock user
-        user: {
-          _id: 2,
-          name: 'Brian',
-          avatar: 'https://placeimg.com/140/140/any'
+          // uid:null,
+          _id: data._id,
+          text: 'Hello ' + name,
+          createdAt: date,
+          user: {
+            _id: 2,
+            name: 'React Native',
+            avatar: 'https://placeimg.com/140/140/any'
           }
-        }
+        },
       )
     })
     this.setState({
@@ -84,26 +86,25 @@ class Chat extends Component {
     this.props.navigation.setOptions({ title: name })
     // Setup Firebase auth() to sign users in Anonymously
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
-      if(!message){
+      if (!message) {
         await firebase.auth().signInAnonymously()
       }
       // Set the user using Anonymous sign in and props
       this.setState({
-        user:{
+        user: {
           _id: message.uid,
           name: name,
           avatar: 'https://placeimg.com/140/140/any'
         }
       })
       // Observe the users message by uid
-      
-      // this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
       this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
-      
-      // Calls the onSnapShot 
-      this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)  
+      // // Calls the onSnapShot 
+      this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
     })
+    // Observe the users message by uid
     this.referenceMessages = firebase.firestore().collection('messages')
+    // this.unsubscribeMessages = this.referenceMessages.onSnapshot(this.onCollectionUpdate) 
   }
 
   componentWillUnmount() {
@@ -159,7 +160,9 @@ class Chat extends Component {
       }
      */
     await this.referenceMessages.add({
-      uid: messages[0]._id,
+      // set uid to reference a user's message
+      // uid: this.state.user._id,
+      _id: messages[0]._id,
       user:this.state.user,
       text:messages[0].text ,
       createdAt: new Date()
@@ -175,11 +178,6 @@ class Chat extends Component {
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
-          user={{
-            _id: 1,
-            name: name,
-            avatar: 'avatar value on 194'
-          }}
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
