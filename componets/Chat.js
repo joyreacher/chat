@@ -150,7 +150,18 @@ class Chat extends Component {
       />
     )
   }
-  
+  // Function deletes message data saved to AsyncStorage as a string
+  async deleteMessages(){
+    try{
+      await AsyncStorage.removeItem('messages')
+      this.setState({
+        messages:[]
+      })
+    }catch(e){
+      console.log('delete message error')
+    }
+  }
+
   // Function saves message data to AsyncStorage as a string
   async saveMessages(){
     try{
