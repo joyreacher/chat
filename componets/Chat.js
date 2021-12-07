@@ -150,12 +150,21 @@ class Chat extends Component {
       />
     )
   }
+  
+  // Function saves message data to AsyncStorage as a string
+  async saveMessages(){
+    try{
+      await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages))
+    }catch(e){
+      console.log('save message error')
+    }
+  }
 
   async onSend(messages = []){
     // Adds user messages (right side)
+    // Stores messages in local storage
     this.setState(previousState => ({
-      messages: GiftedChat.append(previousState.messages, messages)
-    }))
+      messages: GiftedChat.append(previousState.messages, messages) }), () => { this.saveMessages() })
     // Write to Firebase
     /**
       {
