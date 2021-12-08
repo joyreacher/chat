@@ -4,12 +4,17 @@ import React, { Component } from 'react'
 import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView } from 'react-native'
 
 // Gifted chat
-import { GiftedChat, Bubble } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
 
 // Firebase
 import * as firebase from 'firebase'
 require('firebase/firestore')
 
+// AsyncStorage
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+// NetInfo
+import NetInfo from '@react-native-community/netinfo'
 
 // Config for chat-app
 const firebaseConfig = {
@@ -27,11 +32,14 @@ if(!firebase.apps.length){
   firebase.initializeApp(firebaseConfig)
 }
 
+// Check users internet connection using NetINfo
+
 class Chat extends Component {
   constructor (props) {
     super(props)
     this.state = {
       messages: [],
+      isConnected: '',
       user: {
         _id: null,
         name: '',
@@ -75,10 +83,43 @@ class Chat extends Component {
     }) 
   }
 
+  async getMessages(){
+    let messages = ''
+    try{
+      messages = await AsyncStorage.getItem('messages') || []
+      this.setState({
+        messages: JSON.parse(messages)
+      })
+    }catch(e){
+      console.log('getMessages() errorr')
+      console.log(e.messages)
+    }
+  }
+
   componentDidMount (messages = []) {
+    this.getMessages()
+    NetInfo.fetch().then(connection => {
+      if(connection.isConnected){
+        return this.setState({
+          isConnected: true
+        })
+      } else {
+        this.setState({
+          isConnected: false
+        })
+        return
+      }
+    })
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     
+    if(this.state.isConnected){
+      console.log('is connected is false')
+      return this.setState({
+        messages,
+      }) 
+    }
+
     // Setup Firebase auth() to sign users in Anonymously
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
       if (!message) {
@@ -134,12 +175,47 @@ class Chat extends Component {
       />
     )
   }
+  renderInputToolBar(props){
+    if (this.state.isConnected === false){
+      
+    } else {
+      return(
+        <InputToolbar 
+          {...props}
+        />
+      )
+    }
+  }
+  // Function deletes message data saved to AsyncStorage as a string
+  async deleteMessages(){
+    try{
+      await AsyncStorage.removeItem('messages')
+      this.setState({
+        messages:[]
+      })
+    }catch(e){
+      console.log('delete message error')
+    }
+  }
+
+  // Function saves message data to AsyncStorage as a string
+  async saveMessages(){
+    try{
+      await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages))
+    }catch(e){
+      console.log('save message error')
+    }
+  }
 
   async onSend(messages = []){
+    if(this.state.isConnected !== true){
+      return
+    }
     // Adds user messages (right side)
+    // Stores messages in local storage
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages)
-    }))
+    }), () => { this.saveMessages() })
     // Write to Firebase
     /**
       {
@@ -159,8 +235,8 @@ class Chat extends Component {
       // set uid to reference a user's message
       uid: this.state.user._id,
       _id: messages[0]._id,
-      user:this.state.user,
-      text:messages[0].text ,
+      user: this.state.user,
+      text: messages[0].text,
       createdAt: messages[0].createdAt
     })
   }
@@ -177,6 +253,7 @@ class Chat extends Component {
           user={
             this.state.user
           }
+          renderInputToolbar={messages => this.renderInputToolBar(messages)}
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
