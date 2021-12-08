@@ -97,7 +97,9 @@ class Chat extends Component {
   }
 
   componentDidMount (messages = []) {
+    // Store messages in AsyncStorage
     this.getMessages()
+    // Check internet connection
     NetInfo.fetch().then(connection => {
       if(connection.isConnected){
         return this.setState({
@@ -110,11 +112,12 @@ class Chat extends Component {
         return
       }
     })
+    // Get name passed from Start.js
     const { name } = this.props.route.params
+    // Put the name at the top of the device
     this.props.navigation.setOptions({ title: name })
-    
+    // If there is an internet connection set messages state
     if(this.state.isConnected){
-      console.log('is connected is false')
       return this.setState({
         messages,
       }) 
