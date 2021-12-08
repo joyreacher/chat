@@ -1,10 +1,9 @@
-import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 // React native routing
 import 'react-native-gesture-handler'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 // components
 import Start from './componets/Start'
 import Chat from './componets/Chat'
