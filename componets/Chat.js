@@ -13,8 +13,17 @@ require('firebase/firestore')
 // AsyncStorage
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-// // NetInfo
-// import NetInfo from '@react-native-community/netinfo'
+// NetInfo
+import NetInfo from '@react-native-community/netinfo'
+
+
+NetInfo.fetch().then(connection => {
+  if(connection.isConnected){
+    console.log(connection.isConnected + ' You ARE Connected To The Internet')
+  } else {
+    console.log(connection.isConnected + ' You ARE NOT Connected To The Internet')
+  }
+})
 
 // Config for chat-app
 const firebaseConfig = {
@@ -37,11 +46,10 @@ if(!firebase.apps.length){
 class Chat extends Component {
   constructor (props) {
     super(props)
-    const { name, isConnected } = this.props.route.params
     this.state = {
-      name: name,
+      name: '',
       messages: [],
-      isConnected: isConnected,
+      isConnected: '',
       user: {
         _id: null,
         name: '',
@@ -88,8 +96,28 @@ class Chat extends Component {
     let messages = ''
     try{
       messages = await AsyncStorage.getItem('messages') || []
-      this.setState({
-        messages: JSON.parse(messages)
+      NetInfo.fetch().then(connection => {
+        
+        if(connection.isConnected){
+          console.log('checking CONNECTECT')
+          return this.setState({
+            isConnected: true,
+            messages: JSON.parse(messages)
+          })
+        } else {
+          messages = JSON.parse(messages)
+          let sysMessage = messages.findIndex(user => user._id === 2)
+          messages[sysMessage] = {
+            _id: 2,
+            text: 'Hello ' + this.state.name + ' you are now offline.',
+            createAt: new Date(),
+            system: true
+          }
+          return this.setState({
+            isConnected: false,
+            messages: messages
+          })
+        }
       })
     }catch(e){
       console.log('getMessages() errorr')
@@ -98,8 +126,15 @@ class Chat extends Component {
   }
 
   componentDidMount (messages = []) {
+    const { name, isConnected } = this.props.route.params
+    this.setState({
+      name: name,
+      isConnected: isConnected
+    })
     this.props.navigation.setOptions({ title: this.state.name })
     this.getMessages()
+    console.log(this.state.isConnected + ' Connected did mount')
+    if(this.state.isConnected === false){
       // Setup Firebase auth() to sign users in Anonymously
       this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
         try{
@@ -119,11 +154,14 @@ class Chat extends Component {
           this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
         }catch(e){
           console.log(e)
+          this.getMessages()
         }
       })
 
       // Observe all messages
       this.referenceMessages = firebase.firestore().collection('messages')
+    }
+      
     
   }
 
@@ -193,15 +231,17 @@ class Chat extends Component {
   }
 
   async onSend(messages = []){
-    if(this.state.isConnected !== true){
-      return
-    }
-    // Adds user messages (right side)
     // Stores messages in local storage
+    // Write to Firebase
+    
+    // Check the state of connection
+    if(this.state.isConnected === true){
+      this.getMessages()
+    }
+    
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages)
     }), () => { this.saveMessages() })
-    // Write to Firebase
     /**
       {
         uid: number
@@ -215,15 +255,20 @@ class Chat extends Component {
           }
       }
      */
-    // Sets the message to the user sends
-    await this.referenceMessages.add({
-      // set uid to reference a user's message
-      uid: this.state.user._id,
-      _id: messages[0]._id,
-      user: this.state.user,
-      text: messages[0].text,
-      createdAt: messages[0].createdAt
+      try{
+        
+        // Sets the message to the user sends
+        await this.referenceMessages.add({
+        // set uid to reference a user's message
+        uid: this.state.user._id,
+        _id: messages[0]._id,
+        user: this.state.user,
+        text: messages[0].text,
+        createdAt: messages[0].createdAt
     })
+      } catch(e){
+        this.getMessages()
+      }
   }
   render () {
     // store the prop values that are passed
