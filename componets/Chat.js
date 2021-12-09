@@ -46,6 +46,23 @@ class Chat extends Component {
         avatar:''
       }
     }
+    
+    //! Check internet connection
+    NetInfo.fetch().then(connection => {
+      if(connection.isConnected){
+        console.log(connection.isConnected + ' You ARE Connected To The Internet')
+        return this.setState({
+          // ! Test - Setting isConnected to false to simulate no internet connection
+          isConnected: true
+        })
+      } else {
+        console.log(connection.isConnected + ' You ARE NOT Connected To The Internet')
+        return this.setState({
+          isConnected: false
+        })
+        
+      }
+    })
   }
   // Pull message data
   onCollectionUpdate = (querySnapShot) => {
@@ -97,49 +114,36 @@ class Chat extends Component {
   }
 
   componentDidMount (messages = []) {
-    // Store messages in AsyncStorage
-    this.getMessages()
-    //! Check internet connection
-    NetInfo.fetch().then(connection => {
-      if(connection.isConnected){
-        console.log(connection.isConnected)
-        return this.setState({
-          // ! Test - Setting isConnected to false to simulate no internet connection
-          isConnected: true
-        })
-      } else {
-        console.log(connection.isConnected)
-        this.setState({
-          isConnected: false
-        })
-        return
-      }
-    })
     // Get name passed from Start.js
     const { name } = this.props.route.params
     // Put the name at the top of the device
     this.props.navigation.setOptions({ title: name })
-
-    // Setup Firebase auth() to sign users in Anonymously
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
-      if (!message) {
-        return await firebase.auth().signInAnonymously()
-      }
-      // Set the user using Anonymous sign in and props
-      this.setState({
-        user: {
-          _id: message.uid,
-          name: name,
-          avatar: 'https://placeimg.com/140/140/any'
+    this.getMessages()
+      // Setup Firebase auth() to sign users in Anonymously
+      this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
+        try{
+          if (!message) {
+            return await firebase.auth().signInAnonymously()
+          }
+          // Set the user using Anonymous sign in and props
+          this.setState({
+            user: {
+              _id: message.uid,
+              name: name,
+              avatar: 'https://placeimg.com/140/140/any'
+            }
+          })
+          // Observe the users message by uid
+          this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
+          this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
+        }catch(e){
+          console.log(e)
         }
       })
-      // Observe the users message by uid
-      this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
-      this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
-    })
+
+      // Observe all messages
+      this.referenceMessages = firebase.firestore().collection('messages')
     
-    // Observe all messages
-    this.referenceMessages = firebase.firestore().collection('messages')
   }
 
   componentWillUnmount() {
