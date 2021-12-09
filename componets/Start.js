@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, TextInput, Pressable, KeyboardAvoidingView} from 'react-native';
+// NetInfo
+import NetInfo from '@react-native-community/netinfo'
 // background image
 const image = require('../assets/project_assets/bg.png')
 
@@ -14,6 +16,7 @@ class Start extends Component {
   constructor(props){
     super(props)
     this.state = {
+      isConnected: '',
       name:'',
       color:'#FFFFFF',
       contrastColor:'100, 18%, 15%',
@@ -25,6 +28,23 @@ class Start extends Component {
         blue:'#B9C6AE'
       }
     }
+  }
+  componentDidMount(){
+    NetInfo.fetch().then(connection => {
+      if(connection.isConnected){
+        console.log(connection.isConnected + ' You ARE Connected To The Internet')
+        return this.setState({
+          // ! Test - Setting isConnected to false to simulate no internet connection
+          isConnected: true
+        })
+      } else {
+        console.log(connection.isConnected + ' You ARE NOT Connected To The Internet')
+        return this.setState({
+          isConnected: false
+        })
+        
+      }
+    })
   }
   /** 
     - handleColorSelection(color) takes a color hex value and sets the
@@ -116,7 +136,7 @@ class Start extends Component {
               style={[styles.button, {backgroundColor: this.state.color === '#FFFFFF' ? '#757082' : this.state.color}]}
               onPress={() => {
                 // Send name and color state as props to chat - Send Contrast color state for user's message bubbles
-                this.props.navigation.navigate('Chat', {name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor, textColor: this.state.textColor})
+                this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor, textColor: this.state.textColor, isConnected: this.state.isConnected})
                 }
               }>
                 <Text

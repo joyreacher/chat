@@ -13,8 +13,8 @@ require('firebase/firestore')
 // AsyncStorage
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-// NetInfo
-import NetInfo from '@react-native-community/netinfo'
+// // NetInfo
+// import NetInfo from '@react-native-community/netinfo'
 
 // Config for chat-app
 const firebaseConfig = {
@@ -37,41 +37,25 @@ if(!firebase.apps.length){
 class Chat extends Component {
   constructor (props) {
     super(props)
+    const { name, isConnected } = this.props.route.params
     this.state = {
+      name: name,
       messages: [],
-      isConnected: '',
+      isConnected: isConnected,
       user: {
         _id: null,
         name: '',
         avatar:''
       }
     }
-    
-    //! Check internet connection
-    NetInfo.fetch().then(connection => {
-      if(connection.isConnected){
-        console.log(connection.isConnected + ' You ARE Connected To The Internet')
-        return this.setState({
-          // ! Test - Setting isConnected to false to simulate no internet connection
-          isConnected: true
-        })
-      } else {
-        console.log(connection.isConnected + ' You ARE NOT Connected To The Internet')
-        return this.setState({
-          isConnected: false
-        })
-        
-      }
-    })
   }
   // Pull message data
   onCollectionUpdate = (querySnapShot) => {
-    const { name } = this.props.route.params
     // Set system message on every snapshot
     let messages = [
       {
         _id: 2,
-        text: 'Hello ' + name + ' you are now chatting.',
+        text: 'Hello ' + this.state.name + ' you are now chatting.',
         createAt: new Date(),
         system: true
       }
@@ -114,10 +98,7 @@ class Chat extends Component {
   }
 
   componentDidMount (messages = []) {
-    // Get name passed from Start.js
-    const { name } = this.props.route.params
-    // Put the name at the top of the device
-    this.props.navigation.setOptions({ title: name })
+    this.props.navigation.setOptions({ title: this.state.name })
     this.getMessages()
       // Setup Firebase auth() to sign users in Anonymously
       this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
@@ -129,7 +110,7 @@ class Chat extends Component {
           this.setState({
             user: {
               _id: message.uid,
-              name: name,
+              name: this.state.name,
               avatar: 'https://placeimg.com/140/140/any'
             }
           })
@@ -246,7 +227,7 @@ class Chat extends Component {
   }
   render () {
     // store the prop values that are passed
-    const { name, color } = this.props.route.params
+    const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
         <GiftedChat
