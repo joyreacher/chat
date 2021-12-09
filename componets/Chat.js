@@ -99,13 +99,16 @@ class Chat extends Component {
   componentDidMount (messages = []) {
     // Store messages in AsyncStorage
     this.getMessages()
-    // Check internet connection
+    //! Check internet connection
     NetInfo.fetch().then(connection => {
       if(connection.isConnected){
+        console.log(connection.isConnected)
         return this.setState({
+          // ! Test - Setting isConnected to false to simulate no internet connection
           isConnected: true
         })
       } else {
+        console.log(connection.isConnected)
         this.setState({
           isConnected: false
         })
@@ -116,12 +119,6 @@ class Chat extends Component {
     const { name } = this.props.route.params
     // Put the name at the top of the device
     this.props.navigation.setOptions({ title: name })
-    // If there is an internet connection set messages state
-    if(this.state.isConnected){
-      return this.setState({
-        messages,
-      }) 
-    }
 
     // Setup Firebase auth() to sign users in Anonymously
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
