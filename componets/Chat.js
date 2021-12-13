@@ -16,38 +16,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 // NetInfo
 import NetInfo from '@react-native-community/netinfo'
 
+// For testing purposes | See what is stored in AsyncStorage
+import reactotron from 'reactotron-react-native'
 
-// NetInfo.fetch().then(connection => {
-//   if(connection.isConnected){
-//     console.log(connection.isConnected + 'OUTSIDE CHAT You ARE Connected To The Internet')
-//   } else {
-//     console.log(connection.isConnected + 'OUTSIDE CHAT  You ARE NOT Connected To The Internet')
-//   }
-// })
+// Firestore credentials 
+import firebaseConfig from '../firestore/config'
 
-// Config for chat-app
-const firebaseConfig = {
-  apiKey: "AIzaSyAkoN3FsqSE-AWET9Mz2VvH38fhlBMoeyg",
-  authDomain: "chat-app-8deeb.firebaseapp.com",
-  projectId: "chat-app-8deeb",
-  storageBucket: "chat-app-8deeb.appspot.com",
-  messagingSenderId: "909767210092",
-  appId: "1:909767210092:web:495558fb2c88adb4629449",
-  measurementId: "G-B9K5P8CW94"
-};
+
 // Check for firebase when component mounts
-if(!firebase.apps.length){
+if(firebase.apps.length){
+  firebase.app()
+} else {
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig)
 }
 
-// Check users internet connection using NetINfo
 
 class Chat extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      _isMounted: false,
+      isConnected: null,
+      isMounted: false,
+      status: '',
       name: '',
       messages: [],
       isConnected: '',
@@ -146,7 +137,7 @@ class Chat extends Component {
   }
 
   componentDidMount() {
-    this.setState({ _isMounted: true})
+    this.setState({ isMounted: true})
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     const { isConnected } = this.props.route.params
