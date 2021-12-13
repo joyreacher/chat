@@ -84,7 +84,7 @@ class Chat extends Component {
     }) 
   }
 
-  getMessages(){
+  async getMessages(){
     let messages = ''
     // Sets the system message
     const SystemMessage = {
@@ -135,35 +135,40 @@ class Chat extends Component {
       console.log(e)
     }
   }
-
-  componentDidMount() {
-    this.setState({ isMounted: true})
+  
+  async componentDidMount() {
+    // Set isMounted state
+    this.setState({isMounted: true})
+    // Get values from Start page
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
-    const { isConnected } = this.props.route.params
-    
-      // Setup Firebase auth() to sign users in Anonymously
-      this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
+    //! Get messages sets messages state
+    await this.getMessages()
+    // Sets isConnected and status state based on Netinfo
+    await this.checkInternet()
+    if(!this.state.isConnected){
+      // console.log('isConnected is false')
+      return this.findUser()
+    }
+    // Authenticate user
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
+      try{
         if (!message) {
-          await firebase.auth().signInAnonymously()
+          return await Promise.resolve(firebase.auth().signInAnonymously())
         }
-        // Set the user using Anonymous sign in and props
-        this.setState({
-          user: {
-            _id: message.uid,
-            name: this.state.name,
-            avatar: 'https://placeimg.com/140/140/any'
-          }
-        })
-        // Observe the users message by uid
+        // Set the user state | filters messages (left/right, receiver/sender)
+        this.setState({ user: { _id: message.uid, name: name, avatar: "https://placeimg.com/140/140/any"}})
+        // Create a reference to the sender's uid from anonymously signing in
         this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
-        this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
-      })
-      this.referenceMessages = firebase.firestore().collection('messages')
-    
-      // console.log(e)
-      // return this.getMessages()
-    
+        // Snapshot will run onCollectionUpdate to update message feed
+        this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
+        // Add the UI message to let user know they've signed in
+        this.showToast('success', `👍 Hello ${this.state.user.name}`, "To see your messages offline: Enter your name on Start screen")
+      }catch(e){
+        // Show when the user could not be signed in
+        this.showToast('success', `👎  Could not sign you in`, "Try refreshing your page")
+      }
+    })
   }
 
 
