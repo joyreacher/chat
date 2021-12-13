@@ -167,11 +167,11 @@ class Chat extends Component {
   }
 
   componentWillUnmount() {
+    this.setState({isMounted: false})
     // Stop listening to authentication and collection changes
     this.referenceMessagesUser
     this.unsubscribeMessagesUser
     this.referenceMessages
-    this.getMessages()
   }
 
   renderBubble (props) {
