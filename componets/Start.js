@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, TextInput, Pressable, KeyboardAvoidingView} from 'react-native';
-// NetInfo
-import NetInfo from '@react-native-community/netinfo'
 // background image
 const image = require('../assets/project_assets/bg.png')
 
@@ -16,7 +14,6 @@ class Start extends Component {
   constructor(props){
     super(props)
     this.state = {
-      isConnected: '',
       name:'',
       color:'#FFFFFF',
       contrastColor:'100, 18%, 15%',
@@ -28,21 +25,6 @@ class Start extends Component {
         blue:'#B9C6AE'
       }
     }
-  }
-  componentDidMount(){
-    NetInfo.fetch().then(connection => {
-      if(connection.isConnected === true){
-        return this.setState({
-          // ! Test - Setting isConnected to false to simulate no internet connection
-          isConnected: true
-        })
-      } else {
-        return this.setState({
-          isConnected: false
-        })
-        
-      }
-    })
   }
   /** 
     - handleColorSelection(color) takes a color hex value and sets the
