@@ -19,6 +19,9 @@ import NetInfo from '@react-native-community/netinfo'
 // For testing purposes | See what is stored in AsyncStorage
 import reactotron from 'reactotron-react-native'
 
+//React Toast
+import Toast from 'react-native-toast-message'
+
 // Firestore credentials 
 import firebaseConfig from '../firestore/config'
 
@@ -117,53 +120,14 @@ class Chat extends Component {
 
   async getMessages(){
     let messages = ''
-    // Sets the system message
-    const SystemMessage = {
-      _id: 2,
-      text: 'Hello ' + this.state.name + ` you are ${!this.state.status ? '...' : this.state.status}`,
-      createAt: new Date(),
-      system: true
-    }
-    // Try to get new messages
     try{
-      messages =  AsyncStorage.getItem('messages') || []
-      console.log(messages)
-      if(this.state.isConnected){  
-        return this.setState({
-          isConnected: true,
-          messages: messages.length === 0 ? [SystemMessage] : JSON.parse(messages),
-          status: ' now chatting'
-        })
-      } else{
-        messages = messages.length === 0 ? [] : JSON.parse(messages)
-        return this.setState({
-          isConnected: false,
-          messages: messages.length === 0 ? [SystemMessage] : messages,
-          status: ' now offline'
-        })
-      }
-      
-      // NetInfo.fetch().then(connection => {
-      //   if(connection.isConnected != false){
-      //     return this.setState({
-      //       isConnected: true,
-      //       messages: messages.length === 0 ? [SystemMessage] : JSON.parse(messages),
-      //       status: ' now chatting'
-      //     })
-      //   } else {
-      //     messages = messages.length === 0 ? [] : JSON.parse(messages)
-      //     return this.setState({
-      //       isConnected: false,
-      //       messages: messages.length === 0 ? [SystemMessage] : JSON.parse(messages),
-      //       status: ' now offline'
-      //     })
-      //   }
-      // })
-      
-      
+      messages = await AsyncStorage.getItem('messages') || []
+      this.setState({
+        messages: JSON.parse(messages)
+      })
     }catch(e){
       console.log('getMessages() errorr')
-      console.log(e)
+      console.log(e.messages)
     }
   }
   
