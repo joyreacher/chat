@@ -15,30 +15,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // NetInfo
 import NetInfo from '@react-native-community/netinfo'
+import reactotron from 'reactotron-react-native'
 
+// Firestore credentials
+import FireBaseConfig from '../firestore/config'
 
-// NetInfo.fetch().then(connection => {
-//   if(connection.isConnected){
-//     console.log(connection.isConnected + 'OUTSIDE CHAT You ARE Connected To The Internet')
-//   } else {
-//     console.log(connection.isConnected + 'OUTSIDE CHAT  You ARE NOT Connected To The Internet')
-//   }
-// })
+//React Toast
+import Toast from 'react-native-toast-message'
 
-// Config for chat-app
-const firebaseConfig = {
-  apiKey: "AIzaSyAkoN3FsqSE-AWET9Mz2VvH38fhlBMoeyg",
-  authDomain: "chat-app-8deeb.firebaseapp.com",
-  projectId: "chat-app-8deeb",
-  storageBucket: "chat-app-8deeb.appspot.com",
-  messagingSenderId: "909767210092",
-  appId: "1:909767210092:web:495558fb2c88adb4629449",
-  measurementId: "G-B9K5P8CW94"
-};
-// Check for firebase when component mounts
-if(!firebase.apps.length){
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig)
+if(firebase.apps.length){
+  firebase.app()
+} else{
+  firebase.initializeApp(FireBaseConfig)
 }
 
 // Check users internet connection using NetINfo
@@ -47,29 +35,68 @@ class Chat extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      _isMounted: false,
-      name: '',
+      _isMounted: Boolean,
+      status: '...',
       messages: [],
-      isConnected: '',
+      botMessages: [],
+      isConnected: Boolean,
       user: {
-        _id: null,
+        _id: '',
         name: '',
         avatar:''
       }
     }
   }
+  showToast = async (type, text1, text2) => {
+    Toast.show({
+      type: type,
+      text1:text1,
+      text2: text2
+    })
+  }
+  async checkInternet(){
+    if(this.state._isMounted){
+      return NetInfo.fetch().then(connection => {
+        if(connection.isConnected === true){
+          this.setState({
+            isConnected: true,
+            status: 'now online'
+          })
+          return true
+        } else {
+          this.showToast('error', "You have lost internet connection", "Enter your name on start screen to retrieve messages in storage")
+          this.setState({
+            isConnected: false,
+            status: 'now offline'
+          })
+          return false
+        }
+      })
+    }
+  }
+
   // Pull message data
   onCollectionUpdate = (querySnapShot) => {
+    const { name } = this.props.route.params
     // Set system message on every snapshot
     let messages = [
       {
-        _id: 0,
-        text: 'Hello ' + this.state.name + ' you are now chatting.',
+        _id: 2,
+        text: 'Hello ' + name + ' you are ' + this.state.status,
         createAt: new Date(),
         system: true
-      }
+      },
+      {
+        _id: Math.round(Math.random() * 1000000),
+        text:"Hello you are " + this.state.status,
+        createdAt: new Date(),
+        user: {
+          _id:Math.floor(Math.random() * 2000) + 1,
+          name: 'Bot',
+          avatar: 'https://placeimg.com/140/140/any'
+        },
+      },
     ]
-    
     // go through each document
     querySnapShot.forEach((doc) => {
       // get data
@@ -93,108 +120,100 @@ class Chat extends Component {
     }) 
   }
 
-  getMessages(){
+  async getMessages(){
     let messages = ''
-    // Sets the system message
-    const SystemMessage = {
-      _id: 2,
-      text: 'Hello ' + this.state.name + ` you are ${!this.state.status ? '...' : this.state.status}`,
-      createAt: new Date(),
-      system: true
-    }
-    // Try to get new messages
     try{
-      messages =  AsyncStorage.getItem('messages') || []
-      console.log(messages)
-      if(this.state.isConnected){  
-        return this.setState({
-          isConnected: true,
-          messages: messages.length === 0 ? [SystemMessage] : JSON.parse(messages),
-          status: ' now chatting'
-        })
-      } else{
-        messages = messages.length === 0 ? [] : JSON.parse(messages)
-        return this.setState({
-          isConnected: false,
-          messages: messages.length === 0 ? [SystemMessage] : messages,
-          status: ' now offline'
-        })
-      }
-      
-      // NetInfo.fetch().then(connection => {
-      //   if(connection.isConnected != false){
-      //     return this.setState({
-      //       isConnected: true,
-      //       messages: messages.length === 0 ? [SystemMessage] : JSON.parse(messages),
-      //       status: ' now chatting'
-      //     })
-      //   } else {
-      //     messages = messages.length === 0 ? [] : JSON.parse(messages)
-      //     return this.setState({
-      //       isConnected: false,
-      //       messages: messages.length === 0 ? [SystemMessage] : JSON.parse(messages),
-      //       status: ' now offline'
-      //     })
-      //   }
-      // })
-      
-      
+      messages = await AsyncStorage.getItem('messages') || []
+      this.setState({
+        messages: JSON.parse(messages)
+      })
     }catch(e){
+      this.showToast('error', 'No messages for user')
       console.log('getMessages() errorr')
-      console.log(e)
+      console.log(e.messages)
     }
   }
-
-  componentDidMount() {
-    this.setState({ _isMounted: true})
+  // 
+  findUser() {
     const { name } = this.props.route.params
-    this.props.navigation.setOptions({ title: name })
-    const { isConnected } = this.props.route.params
-    
-      // Setup Firebase auth() to sign users in Anonymously
-      this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
-        if (!message) {
-          await firebase.auth().signInAnonymously()
-        }
-        // Set the user using Anonymous sign in and props
+    // Copy the AsyncStorage parsed array
+    let messages = this.state.messages.map(user => {return user})
+    // If the user had no messages saved error toast will show
+    if(messages = []){
+      return this.showToast('error', 'You are offline', 'No messages to show')
+    }
+    messages.map(message => {
+      if(message.user.name === name){
+        console.log(message.user.name)
         this.setState({
-          user: {
-            _id: message.uid,
-            name: this.state.name,
-            avatar: 'https://placeimg.com/140/140/any'
+          user:{
+            _id: message.user._id,
+            name: message.user.name,
+            avatar: message.user.avatar
           }
         })
-        // Observe the users message by uid
-        this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
-        this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate)
-      })
-      this.referenceMessages = firebase.firestore().collection('messages')
-    
-      // console.log(e)
-      // return this.getMessages()
-    
+        return console.log('found a match')
+      }
+    })
   }
 
-
-  // componentDidMount (messages = []) {
-  //   const { name, isConnected } = this.props.route.params
-  //   this.setState({
-  //     name: name,
-  //     isConnected: isConnected
-  //   })
-  //   this.props.navigation.setOptions({ title: this.state.name })
-  //   console.log(this.state.isConnected + ' Connected did mount')
-     
-  //     // Observe all messages
-  //     this.referenceMessages = firebase.firestore().collection('messages')
-  // }
+  async componentDidMount () {
+    this.setState({_isMounted: true})
+    const { name } = this.props.route.params
+    this.props.navigation.setOptions({ title: name })
+    await this.checkInternet()
+    await this.getMessages()
+    if(!this.state.isConnected){
+      this.setState({
+        messages: [
+        {
+          _id: 2,
+          text: 'Hello ' + name + ' you are ' + this.state.status,
+          createAt: new Date(),
+          system: true
+        },
+        {
+          _id: Math.round(Math.random() * 1000000),
+          text:"Hello you are " + this.state.status,
+          createdAt: new Date(),
+          user: {
+            _id:Math.floor(Math.random() * 2000) + 1,
+            name: 'Bot',
+            avatar: 'https://placeimg.com/140/140/any'
+          },
+        },
+      
+        ]
+        })
+      return this.findUser()
+    }
+    // Authenticate user
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
+      try{
+        await this.showToast('info', 'Authenticating')
+        if (!message) {
+          return await Promise.resolve(firebase.auth().signInAnonymously())
+        }
+        this.setState({ user: { _id: message.uid, name: name, avatar: "https://placeimg.com/140/140/any"}})
+        this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
+        this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
+        if(this.state.user.name === ''){
+          return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
+        }
+        this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
+      }catch(e){
+        this.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
+      }
+    })
+  }
 
   componentWillUnmount() {
+    this.setState({_isMounted: false})
     // Stop listening to authentication and collection changes
     this.referenceMessagesUser
     this.unsubscribeMessagesUser
     this.referenceMessages
-    this.getMessages()
+    
   }
 
   renderBubble (props) {
@@ -241,7 +260,6 @@ class Chat extends Component {
       this.setState({
         messages:[]
       })
-      this.props.navigation.navigate('Start')
     }catch(e){
       console.log('delete message error')
     }
@@ -256,26 +274,11 @@ class Chat extends Component {
     }
   }
 
-  onSend(messages = []){
-    // Stores messages in local storage
-    this.setState(previousState => ({
-      messages: GiftedChat.append(previousState.messages, messages)
-    }), () => { this.saveMessages() })
-    /**
-      {
-        uid: number
-        text: string
-        createdAt: timestamp
-        user: user state object
-          {
-            _id: number
-            name: string
-            avatar: string
-          }
-      }
-     */
-    // Sets the message to the user sends
-    this.referenceMessages.add({
+  async onSend(messages = []){
+    // messages state will contain the most recent message -- the thread will be stored in AsyncStorage
+    this.setState(previousState => ({ messages: GiftedChat.append(previousState.messages, messages) }), () => { this.saveMessages() })
+    this.referenceMessages = firebase.firestore().collection('messages')
+    await this.referenceMessages.add({
       // set uid to reference a user's message
       uid: this.state.user._id,
       _id: messages[0]._id,
@@ -283,25 +286,22 @@ class Chat extends Component {
       text: messages[0].text,
       createdAt: messages[0].createdAt
     })
-        
   }
+  
   render () {
+    
     // store the prop values that are passed
-    const { color } = this.props.route.params
+    const { name, color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
-        <Pressable
-          onPress={() => this.deleteMessages()}
-        >
-          <Text>Delete Messages</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => this.getMessages()}
-        >
-          <Text>Get Messages</Text>
+        <Pressable 
+            onPress={() => this.deleteMessages()}
+          >
+          <Text>Delete AsyncStorage</Text>
         </Pressable>
         <GiftedChat
         // Add the prop necessary to change the bubble color
+          showUserAvatar={true}
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}

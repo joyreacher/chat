@@ -2,6 +2,7 @@ if(__DEV__) {
   import('./ReactotronConfig').then(() => console.log('Reactotron Configured'))
 }
 import React from 'react'
+import Toast from 'react-native-toast-message'
 // React native routing
 import 'react-native-gesture-handler'
 import { NavigationContainer } from '@react-navigation/native'
@@ -28,6 +29,7 @@ export default function App () {
         />
 
       </Stack.Navigator>
+      <Toast />
     </NavigationContainer>
   )
 }
