@@ -52,6 +52,23 @@ class Chat extends Component {
       }
     }
   }
+  findUser(){
+    const { name } = this.props.route.params
+    // Copy the AsyncStorage parsed array
+    let messages = this.state.messages.map(user => {return user})
+    messages.map(message => {
+      if(message.user.name === name){
+        this.setState({
+          user:{
+            _id: message.user._id,
+            name: message.user.name,
+            avatar: message.user.avatar
+          }
+        })
+        return console.log('found a match')
+      }
+    })
+  }
   
   showToast = ({type, text1, text2}) => {
     Toast.show({
