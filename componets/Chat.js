@@ -166,20 +166,6 @@ class Chat extends Component {
     })
   }
 
-
-  // componentDidMount (messages = []) {
-  //   const { name, isConnected } = this.props.route.params
-  //   this.setState({
-  //     name: name,
-  //     isConnected: isConnected
-  //   })
-  //   this.props.navigation.setOptions({ title: this.state.name })
-  //   console.log(this.state.isConnected + ' Connected did mount')
-     
-  //     // Observe all messages
-  //     this.referenceMessages = firebase.firestore().collection('messages')
-  // }
-
   componentWillUnmount() {
     // Stop listening to authentication and collection changes
     this.referenceMessagesUser
