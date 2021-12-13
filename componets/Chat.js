@@ -197,7 +197,10 @@ class Chat extends Component {
         this.setState({ user: { _id: message.uid, name: name, avatar: "https://placeimg.com/140/140/any"}})
         this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
         this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
-        this.showToast('success', `👍 Hello ${this.state.user.name}`, "To see your messages offline: Enter your name on Start screen")
+        if(this.state.user.name === ''){
+          return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
+        }
+        this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
       }catch(e){
         this.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
       }
