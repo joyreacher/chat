@@ -233,26 +233,14 @@ class Chat extends Component {
     }
   }
 
-  onSend(messages = []){
-    // Stores messages in local storage
-    this.setState(previousState => ({
-      messages: GiftedChat.append(previousState.messages, messages)
-    }), () => { this.saveMessages() })
-    /**
-      {
-        uid: number
-        text: string
-        createdAt: timestamp
-        user: user state object
-          {
-            _id: number
-            name: string
-            avatar: string
-          }
-      }
-     */
-    // Sets the message to the user sends
-    this.referenceMessages.add({
+  async onSend(messages = []){
+    // messages state will contain the most recent message -- the thread will be stored in AsyncStorage
+    this.setState(previousState => ({ messages: GiftedChat.append(previousState.messages, messages) }), () => { this.saveMessages() })
+    
+    reactotron.log(messages)
+    
+    this.referenceMessages = firebase.firestore().collection('messages')
+    await this.referenceMessages.add({
       // set uid to reference a user's message
       uid: this.state.user._id,
       _id: messages[0]._id,
@@ -260,7 +248,6 @@ class Chat extends Component {
       text: messages[0].text,
       createdAt: messages[0].createdAt
     })
-        
   }
   render () {
     // store the prop values that are passed
