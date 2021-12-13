@@ -22,10 +22,11 @@ import FireBaseConfig from '../firestore/config'
 
 //React Toast
 import Toast from 'react-native-toast-message'
-
+// If there is a firebase app initialized. Load it.
 if(firebase.apps.length){
   firebase.app()
 } else{
+  // If there is NOT a firebase app initialized. Initialize it.
   firebase.initializeApp(FireBaseConfig)
 }
 
@@ -47,6 +48,7 @@ class Chat extends Component {
       }
     }
   }
+  // Show react toast message 
   showToast = async (type, text1, text2) => {
     Toast.show({
       type: type,
@@ -54,6 +56,7 @@ class Chat extends Component {
       text2: text2
     })
   }
+  // Checks internet connection | returns isConnected State w/Bool
   async checkInternet(){
     if(this.state._isMounted){
       return NetInfo.fetch().then(connection => {
@@ -74,8 +77,7 @@ class Chat extends Component {
       })
     }
   }
-
-  // Pull message data
+  // Updates data with snapshot | returns message state with total number of messages in firebase db
   onCollectionUpdate = (querySnapShot) => {
     const { name } = this.props.route.params
     // Set system message on every snapshot
@@ -119,7 +121,7 @@ class Chat extends Component {
       messages,
     }) 
   }
-
+  // Gets messages from asyncStorage (local storage for mobile devices)
   async getMessages(){
     let messages = ''
     try{
@@ -133,7 +135,7 @@ class Chat extends Component {
       console.log(e.messages)
     }
   }
-  // 
+  // Iterates through message data stored in asyncStorage to return the user with the same name
   findUser() {
     const { name } = this.props.route.params
     // Copy the AsyncStorage parsed array
@@ -156,7 +158,8 @@ class Chat extends Component {
       }
     })
   }
-
+  // Authenticates the user if there is an internet connection
+  // Loads and filters asyncStorage data if not
   async componentDidMount () {
     this.setState({_isMounted: true})
     const { name } = this.props.route.params
@@ -206,7 +209,7 @@ class Chat extends Component {
       }
     })
   }
-
+  // Terminates observers and asyncronus functions
   componentWillUnmount() {
     this.setState({_isMounted: false})
     // Stop listening to authentication and collection changes
@@ -215,7 +218,7 @@ class Chat extends Component {
     this.referenceMessages
     
   }
-
+  // Control how the message bubbles look
   renderBubble (props) {
     const { contrastColor, textColor } = this.props.route.params
     return (
@@ -242,6 +245,7 @@ class Chat extends Component {
       />
     )
   }
+  // Hide the tool bar when there is no internet connection
   renderInputToolBar(props){
     if (this.state.isConnected === false){
       
@@ -264,7 +268,6 @@ class Chat extends Component {
       console.log('delete message error')
     }
   }
-
   // Function saves message data to AsyncStorage as a string
   async saveMessages(){
     try{
@@ -273,7 +276,7 @@ class Chat extends Component {
       console.log('save message error')
     }
   }
-
+  // Adds messages to messages state using GiftedChat | referanceMessages is used to write messages to firebase
   async onSend(messages = []){
     // messages state will contain the most recent message -- the thread will be stored in AsyncStorage
     this.setState(previousState => ({ messages: GiftedChat.append(previousState.messages, messages) }), () => { this.saveMessages() })
@@ -287,18 +290,18 @@ class Chat extends Component {
       createdAt: messages[0].createdAt
     })
   }
-  
   render () {
-    
     // store the prop values that are passed
-    const { name, color } = this.props.route.params
+    const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
+        {/* FOR TESTING PURPOSES ONLY */}
         <Pressable 
             onPress={() => this.deleteMessages()}
           >
           <Text>Delete AsyncStorage</Text>
         </Pressable>
+        {/* MAIN UI */}
         <GiftedChat
         // Add the prop necessary to change the bubble color
           showUserAvatar={true}
