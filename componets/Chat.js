@@ -50,6 +50,13 @@ class Chat extends Component {
     }
   }
   
+  showToast = ({type, text1, text2}) => {
+    Toast.show({
+      type: type,
+      text1:text1,
+      text2: text2
+    })
+  }
   // Checks network connection with Netinfo | Sets isConnected state based on response
   // isMounted needs to be true
   async checkInternet(){
