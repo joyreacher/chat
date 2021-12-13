@@ -49,6 +49,30 @@ class Chat extends Component {
       }
     }
   }
+  
+  // Checks network connection with Netinfo | Sets isConnected state based on response
+  // isMounted needs to be true
+  async checkInternet(){
+    if(this.state.isMounted){
+      return NetInfo.fetch().then(connection => {
+        if(connection.isConnected === true){
+          this.setState({
+            isConnected: true,
+            status: 'now chatting'
+          })
+          return true
+        } else {
+          this.showToast('error', "It seems you have lost internet connection", "We'll try to reconnect you. Or you can refresh this page.")
+          this.setState({
+            isConnected: false,
+            status: 'now offline'
+          })
+          return false
+        }
+      })
+    }
+  }
+
   // Pull message data
   onCollectionUpdate = (querySnapShot) => {
     // Set system message on every snapshot
