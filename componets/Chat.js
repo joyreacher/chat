@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 // react native specific components
-import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView } from 'react-native'
+import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text } from 'react-native'
 
 // Gifted chat
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
@@ -19,9 +19,9 @@ import NetInfo from '@react-native-community/netinfo'
 
 NetInfo.fetch().then(connection => {
   if(connection.isConnected){
-    console.log(connection.isConnected + ' You ARE Connected To The Internet')
+    console.log(connection.isConnected + 'OUTSIDE CHAT You ARE Connected To The Internet')
   } else {
-    console.log(connection.isConnected + ' You ARE NOT Connected To The Internet')
+    console.log(connection.isConnected + 'OUTSIDE CHAT  You ARE NOT Connected To The Internet')
   }
 })
 
@@ -46,8 +46,10 @@ if(!firebase.apps.length){
 class Chat extends Component {
   constructor (props) {
     super(props)
+    const { name } = this.props.route.params
+    this.props.navigation.setOptions({ title: name })
     this.state = {
-      name: '',
+      name: name,
       messages: [],
       isConnected: '',
       user: {
@@ -62,7 +64,7 @@ class Chat extends Component {
     // Set system message on every snapshot
     let messages = [
       {
-        _id: 2,
+        _id: 0,
         text: 'Hello ' + this.state.name + ' you are now chatting.',
         createAt: new Date(),
         system: true
@@ -94,28 +96,29 @@ class Chat extends Component {
 
   async getMessages(){
     let messages = ''
+    // Sets the system message
+    const SystemMessage = {
+      _id: 2,
+      text: 'Hello ' + this.state.name + ` you are ${!this.state.status ? '...' : this.state.status}`,
+      createAt: new Date(),
+      system: true
+    }
+    // Try to get new messages
     try{
       messages = await AsyncStorage.getItem('messages') || []
       NetInfo.fetch().then(connection => {
-        
         if(connection.isConnected){
-          console.log('checking CONNECTECT')
           return this.setState({
             isConnected: true,
-            messages: JSON.parse(messages)
+            messages: messages.length === 0 ? [SystemMessage] : JSON.parse(messages),
+            status: ' now chatting'
           })
         } else {
-          messages = JSON.parse(messages)
-          let sysMessage = messages.findIndex(user => user._id === 2)
-          messages[sysMessage] = {
-            _id: 2,
-            text: 'Hello ' + this.state.name + ' you are now offline.',
-            createAt: new Date(),
-            system: true
-          }
+          messages = messages.length === 0 ? [] : JSON.parse(messages)
           return this.setState({
             isConnected: false,
-            messages: messages
+            messages: messages.length === 0 ? [SystemMessage] : JSON.parse(messages),
+            status: ' now offline'
           })
         }
       })
@@ -134,7 +137,7 @@ class Chat extends Component {
     this.props.navigation.setOptions({ title: this.state.name })
     this.getMessages()
     console.log(this.state.isConnected + ' Connected did mount')
-    if(this.state.isConnected === false){
+    
       // Setup Firebase auth() to sign users in Anonymously
       this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
         try{
@@ -160,7 +163,7 @@ class Chat extends Component {
 
       // Observe all messages
       this.referenceMessages = firebase.firestore().collection('messages')
-    }
+    
       
     
   }
@@ -170,6 +173,7 @@ class Chat extends Component {
     this.referenceMessagesUser
     this.unsubscribeMessagesUser
     this.referenceMessages
+    this.getMessages()
   }
 
   renderBubble (props) {
@@ -216,6 +220,7 @@ class Chat extends Component {
       this.setState({
         messages:[]
       })
+      this.props.navigation.navigate('Start')
     }catch(e){
       console.log('delete message error')
     }
@@ -232,7 +237,9 @@ class Chat extends Component {
 
   async onSend(messages = []){
     // Stores messages in local storage
-    // Write to Firebase
+    this.setState(previousState => ({
+      messages: GiftedChat.append(previousState.messages, messages)
+    }), () => { this.saveMessages() })
     
     // Check the state of connection
     if(this.state.isConnected === true){
@@ -275,6 +282,16 @@ class Chat extends Component {
     const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
+        <Pressable
+          onPress={() => this.deleteMessages()}
+        >
+          <Text>Delete Messages</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => this.getMessages()}
+        >
+          <Text>Get Messages</Text>
+        </Pressable>
         <GiftedChat
         // Add the prop necessary to change the bubble color
           renderBubble={this.renderBubble.bind(this)}

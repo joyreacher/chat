@@ -31,14 +31,12 @@ class Start extends Component {
   }
   componentDidMount(){
     NetInfo.fetch().then(connection => {
-      if(connection.isConnected){
-        console.log(connection.isConnected + ' You ARE Connected To The Internet')
+      if(connection.isConnected === true){
         return this.setState({
           // ! Test - Setting isConnected to false to simulate no internet connection
           isConnected: true
         })
       } else {
-        console.log(connection.isConnected + ' You ARE NOT Connected To The Internet')
         return this.setState({
           isConnected: false
         })
