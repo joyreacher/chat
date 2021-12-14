@@ -326,9 +326,6 @@ class Chat extends Component {
     const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
-        {
-          this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />
-        }
         {/* FOR TESTING PURPOSES ONLY */}
         <View style={buttons.container}>
           {/* DELETE ASYNC STORAGE */}
@@ -364,8 +361,8 @@ class Chat extends Component {
           </View>
         </View>
         {/* MAIN UI */}
+        {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />}
         <GiftedChat
-        // Add the prop necessary to change the bubble color
           showUserAvatar={true}
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
