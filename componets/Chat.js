@@ -297,15 +297,23 @@ class Chat extends Component {
   }
   // Pick an image from the user's device
   async pickImage(){
-    // Ask permission
-    //! If permission is NOT granted return here
-    //? if permission IS granted
-    //? Call launchImageLibraryAsync to let them pick a file
     /*
       ? launchImageLibraryAsync returns object containing uri
       ? cancelled which is true if the user cancels the process and doesnt pick a file
     */
-    //? Update image state if file is chosen
+    // Ask permission
+    const { pickImageStatus } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY)    
+    //? if permission IS granted
+    if(pickImageStatus === 'granted'){
+      //? Call launchImageLibraryAsync to let them pick a file
+      let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: 'Images'}).catch(error => console.log('launch image Lib Async error'))
+      //? Update image state if request is not cancelled
+      if(!result.cancelled){
+        this.setState({
+          image: result
+        })
+      }
+    }
   }
   // Take a photo with users device
   takePhoto(){
