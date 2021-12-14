@@ -3,9 +3,10 @@ import React, { Component } from 'react'
 // Expo
 import * as Permissions from 'expo-permissions'
 import * as ImagePicker from 'expo-image-picker'
+import { Camera } from 'expo-camera'
 
 // react native specific components
-import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text, Button } from 'react-native'
+import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text, Image } from 'react-native'
 
 // Gifted chat
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
@@ -26,6 +27,7 @@ import FireBaseConfig from '../firestore/config'
 
 //React Toast
 import Toast from 'react-native-toast-message'
+import { CAMERA } from 'expo-permissions'
 // If there is a firebase app initialized. Load it.
 if(firebase.apps.length){
   firebase.app()
@@ -296,23 +298,23 @@ class Chat extends Component {
     })
   }
   // Pick an image from the user's device
-  async pickImage(){
+  pickImage = async () => {
     /*
       ? launchImageLibraryAsync returns object containing uri
       ? cancelled which is true if the user cancels the process and doesnt pick a file
     */
     // Ask permission
-    const { pickImageStatus } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY)    
+    const pickImageStatus  = await Camera.requestCameraPermissionsAsync()
     //? if permission IS granted
-    if(pickImageStatus === 'granted'){
-      //? Call launchImageLibraryAsync to let them pick a file
-      let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: 'Images'}).catch(error => console.log('launch image Lib Async error'))
-      //? Update image state if request is not cancelled
-      if(!result.cancelled){
-        this.setState({
-          image: result
-        })
-      }
+    if(pickImageStatus.status === 'granted'){
+        //? Call launchImageLibraryAsync to let them pick a file
+        let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: 'Images'}).catch(error => console.log('launch image Lib Async error'))
+        //? Update image state if request is not cancelled
+        if(!result.cancelled){
+          this.setState({
+            image: result
+          })
+        }
     }
   }
   // Take a photo with users device
@@ -324,6 +326,9 @@ class Chat extends Component {
     const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
+        {
+          this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />
+        }
         {/* FOR TESTING PURPOSES ONLY */}
         <View style={buttons.container}>
           {/* DELETE ASYNC STORAGE */}
@@ -342,7 +347,7 @@ class Chat extends Component {
             style={[buttons.btnContainer, { backgroundColor: 'white' }]}
           >
             <Pressable
-              onPress={() => this.pickImage()}
+              onPress={this.pickImage}
             >
               <Text>Pick image</Text>
             </Pressable>
