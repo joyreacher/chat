@@ -304,9 +304,9 @@ class Chat extends Component {
       ? cancelled which is true if the user cancels the process and doesnt pick a file
     */
     // Ask permission
-    const pickImageStatus  = await Camera.requestCameraPermissionsAsync()
+    const { status }  = await Camera.requestCameraPermissionsAsync()
     //? if permission IS granted
-    if(pickImageStatus.status === 'granted'){
+    if(status === 'granted'){
         //? Call launchImageLibraryAsync to let them pick a file
         let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: 'Images'}).catch(error => console.log('launch image Lib Async error'))
         //? Update image state if request is not cancelled
@@ -318,8 +318,19 @@ class Chat extends Component {
     }
   }
   // Take a photo with users device
-  takePhoto(){
-    
+  async takePhoto() {
+    const { status } = await Camera.requestCameraPermissionsAsync()
+    console.log(status)
+    if (status === 'granted') {
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: 'Images',
+      }).catch(error => console.log(error));
+      if (!result.cancelled) {
+        this.setState({
+          image: result
+        });
+      }
+    }
   }
   render () {
     // store the prop values that are passed
