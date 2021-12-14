@@ -5,7 +5,7 @@ import * as Permissions from 'expo-permissions'
 import * as ImagePicker from 'expo-image-picker'
 
 // react native specific components
-import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text } from 'react-native'
+import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text, Button } from 'react-native'
 
 // Gifted chat
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
@@ -301,24 +301,36 @@ class Chat extends Component {
       <View style={[{ backgroundColor: color }, view.outer]}>
         {/* FOR TESTING PURPOSES ONLY */}
         <View style={buttons.container}>
-          {/* DELETE ASYNCSTORAGE */}
-          <Pressable 
+          {/* DELETE ASYNC STORAGE */}
+          <View
+            style={[buttons.btnContainer, { backgroundColor: 'red' }]}
+          >
+            <Pressable
               onPress={() => this.deleteMessages()}
             >
-            <Text>Delete storage</Text>
-          </Pressable>
+              <Text>Delete storage</Text>
+            </Pressable>
+          </View>
           {/* PICK IMAGE */}
-          <Pressable 
+          <View
+            style={[buttons.btnContainer, { backgroundColor: 'blue' }]}
+          >
+            <Pressable
               onPress={() => this.deleteMessages()}
             >
-            <Text>Pick image</Text>
-          </Pressable>
+              <Text>Pick image</Text>
+            </Pressable>
+          </View>
           {/* TAKE PHOTO */}
-          <Pressable 
+          <View
+            style={[buttons.btnContainer, { backgroundColor: 'green' }]}
+          >
+            <Pressable
               onPress={() => this.deleteMessages()}
             >
-            <Text>Take photo</Text>
-          </Pressable>
+              <Text>Take photo</Text>
+            </Pressable>
+          </View>
         </View>
         {/* MAIN UI */}
         <GiftedChat
@@ -355,7 +367,11 @@ const buttons = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    // justifyContent: 'space-around',
     marginTop: 30
+  },
+  btnContainer:{
+    height: 60,
+    width: '34%'
   }
 })
