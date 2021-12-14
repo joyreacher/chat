@@ -27,14 +27,17 @@ import FireBaseConfig from '../firestore/config'
 
 //React Toast
 import Toast from 'react-native-toast-message'
-import { CAMERA } from 'expo-permissions'
+
+// Components
+import CustomActions from './CustomActions'
 // If there is a firebase app initialized. Load it.
-if(firebase.apps.length){
+if(!firebase.apps.length){
   firebase.app()
-} else{
-  // If there is NOT a firebase app initialized. Initialize it.
-  firebase.initializeApp(FireBaseConfig)
 }
+//  else{
+//   // If there is NOT a firebase app initialized. Initialize it.
+//   firebase.initializeApp(FireBaseConfig)
+// }
 
 // Check users internet connection using NetINfo
 
@@ -332,6 +335,11 @@ class Chat extends Component {
       }
     }
   }
+
+  // Custom actions
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />
+  }
   render () {
     // store the prop values that are passed
     const { color } = this.props.route.params
@@ -382,6 +390,7 @@ class Chat extends Component {
             this.state.user
           }
           renderInputToolbar={messages => this.renderInputToolBar(messages)}
+          renderAccessory={() => this.renderCustomActions()}
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
