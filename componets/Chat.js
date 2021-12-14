@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
 
+// Expo
+import * as Permissions from 'expo-permissions'
+import * as ImagePicker from 'expo-image-picker'
+
 // react native specific components
 import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text } from 'react-native'
 
