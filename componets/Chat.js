@@ -354,6 +354,8 @@ const view = StyleSheet.create({
 const buttons = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 30
   }
 })
