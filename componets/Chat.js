@@ -134,7 +134,7 @@ class Chat extends Component {
         messages: JSON.parse(messages)
       })
     }catch(e){
-      this.showToast('error', 'No messages for user')
+      // this.showToast('error', 'No messages for user')
       console.log('getMessages() errorr')
       console.log(e.messages)
     }
@@ -197,7 +197,7 @@ class Chat extends Component {
     // Authenticate user
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
       try{
-        await this.showToast('info', 'Authenticating')
+        // await this.showToast('info', 'Authenticating')
         if (!message) {
           return await Promise.resolve(firebase.auth().signInAnonymously())
         }
@@ -205,9 +205,9 @@ class Chat extends Component {
         this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
         this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
         if(this.state.user.name === ''){
-          return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
+          // return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
         }
-        this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
+        // this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
       }catch(e){
         this.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
       }
@@ -300,11 +300,26 @@ class Chat extends Component {
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
         {/* FOR TESTING PURPOSES ONLY */}
-        <Pressable 
-            onPress={() => this.deleteMessages()}
-          >
-          <Text>Delete AsyncStorage</Text>
-        </Pressable>
+        <View style={buttons.container}>
+          {/* DELETE ASYNCSTORAGE */}
+          <Pressable 
+              onPress={() => this.deleteMessages()}
+            >
+            <Text>Delete storage</Text>
+          </Pressable>
+          {/* PICK IMAGE */}
+          <Pressable 
+              onPress={() => this.deleteMessages()}
+            >
+            <Text>Pick image</Text>
+          </Pressable>
+          {/* TAKE PHOTO */}
+          <Pressable 
+              onPress={() => this.deleteMessages()}
+            >
+            <Text>Take photo</Text>
+          </Pressable>
+        </View>
         {/* MAIN UI */}
         <GiftedChat
         // Add the prop necessary to change the bubble color
@@ -333,5 +348,12 @@ export default Chat
 const view = StyleSheet.create({
   outer: {
     flex: 1
+  }
+})
+
+const buttons = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'row'
   }
 })
