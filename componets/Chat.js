@@ -294,6 +294,14 @@ class Chat extends Component {
       createdAt: messages[0].createdAt
     })
   }
+  // Pick an image from the user's device
+  pickImage(){
+    
+  }
+  // Take a photo with users device
+  takePhoto(){
+    
+  }
   render () {
     // store the prop values that are passed
     const { color } = this.props.route.params
@@ -303,31 +311,31 @@ class Chat extends Component {
         <View style={buttons.container}>
           {/* DELETE ASYNC STORAGE */}
           <View
-            style={[buttons.btnContainer, { backgroundColor: 'red' }]}
+            style={[buttons.btnContainer, { backgroundColor: 'white' }]}
           >
             <Pressable
               onPress={() => this.deleteMessages()}
-              // style={{flex:1, justifyContent: 'center', alignItems:'center'}}
+              style={{}}
             >
               <Text>Delete storage</Text>
             </Pressable>
           </View>
           {/* PICK IMAGE */}
           <View
-            style={[buttons.btnContainer, { backgroundColor: 'blue' }]}
+            style={[buttons.btnContainer, { backgroundColor: 'white' }]}
           >
             <Pressable
-              onPress={() => this.deleteMessages()}
+              onPress={() => this.pickImage()}
             >
               <Text>Pick image</Text>
             </Pressable>
           </View>
           {/* TAKE PHOTO */}
           <View
-            style={[buttons.btnContainer, { backgroundColor: 'green' }]}
+            style={[buttons.btnContainer, { backgroundColor: 'white' }]}
           >
             <Pressable
-              onPress={() => this.deleteMessages()}
+              onPress={() => this.takePhoto()}
             >
               <Text>Take photo</Text>
             </Pressable>
