@@ -428,7 +428,7 @@ class Chat extends Component {
             this.state.user
           }
           renderInputToolbar={messages => this.renderInputToolBar(messages)}
-          renderAccessory={() => this.renderCustomActions()}
+          renderActions={() => this.renderCustomActions()}
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
