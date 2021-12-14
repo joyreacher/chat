@@ -307,6 +307,7 @@ class Chat extends Component {
           >
             <Pressable
               onPress={() => this.deleteMessages()}
+              // style={{flex:1, justifyContent: 'center', alignItems:'center'}}
             >
               <Text>Delete storage</Text>
             </Pressable>
@@ -372,6 +373,9 @@ const buttons = StyleSheet.create({
   },
   btnContainer:{
     height: 60,
-    width: '34%'
+    width: '34%',
+    flex:1,
+    alignItems:'center',
+    justifyContent:'center'
   }
 })
