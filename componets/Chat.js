@@ -40,6 +40,7 @@ class Chat extends Component {
   constructor (props) {
     super(props)
     this.state = {
+      image: null,
       _isMounted: Boolean,
       status: '...',
       messages: [],
@@ -295,8 +296,16 @@ class Chat extends Component {
     })
   }
   // Pick an image from the user's device
-  pickImage(){
-    
+  async pickImage(){
+    // Ask permission
+    //! If permission is NOT granted return here
+    //? if permission IS granted
+    //? Call launchImageLibraryAsync to let them pick a file
+    /*
+      ? launchImageLibraryAsync returns object containing uri
+      ? cancelled which is true if the user cancels the process and doesnt pick a file
+    */
+    //? Update image state if file is chosen
   }
   // Take a photo with users device
   takePhoto(){
