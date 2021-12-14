@@ -1,8 +1,34 @@
 import React, { useEffect } from "react"
-import { StyleSheet, TouchableHighlight, Text, View } from 'react-native'
+import { ActionSheetIOS, StyleSheet, TouchableHighlight, Text, View } from 'react-native'
 function CustomActions() {
   const onActionPress = () =>{
-    console.log('pressssss')
+    const options = [
+      'Choose From Library',
+      'Take Picture',
+      'Send Location',
+      'Cancel'
+    ]
+    const cancelButtonIndex = options.length - 1
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      async (buttonIndex) => {
+        switch(buttonIndex){
+          case 0:
+            console.log('pick image')
+            return
+          case 1:
+            console.log('take photo')
+            return
+          case 2:
+            console.log('get location')
+            return 
+          default:
+        }
+      }
+    )
   }
   return (
     <>
