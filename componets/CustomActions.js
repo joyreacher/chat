@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, { useEffect } from "react"
 import { ActionSheetIOS, StyleSheet, TouchableHighlight, Text, View } from 'react-native'
 function CustomActions() {
@@ -45,6 +46,9 @@ function CustomActions() {
 }
 
 export default CustomActions
+CustomActions.contextTypes = {
+  actionSheet: PropTypes.func
+}
 
 const styles = StyleSheet.create({
   container: {
