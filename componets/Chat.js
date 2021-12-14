@@ -4,6 +4,8 @@ import React, { Component } from 'react'
 import * as Permissions from 'expo-permissions'
 import * as ImagePicker from 'expo-image-picker'
 import { Camera } from 'expo-camera'
+import * as Location from 'expo-location'
+import MapView from 'react-native-maps'
 
 // react native specific components
 import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text, Image } from 'react-native'
@@ -32,7 +34,8 @@ import Toast from 'react-native-toast-message'
 import CustomActions from './CustomActions'
 // If there is a firebase app initialized. Load it.
 if(!firebase.apps.length){
-  firebase.app()
+  // firebase.app()
+  firebase.initializeApp(FireBaseConfig)
 }
 //  else{
 //   // If there is NOT a firebase app initialized. Initialize it.
@@ -335,10 +338,24 @@ class Chat extends Component {
       }
     }
   }
-
   // Custom actions
   renderCustomActions = (props) => {
     return <CustomActions {...props} />
+  }
+  // Get location
+  getLocation = async() => {
+    // const { status } = await Permissions.askAsync(Permissions.LOCATION_FOREGROUND)
+    const { status } = await Location.requestForegroundPermissionsAsync()
+    console.log(status)
+    if(status === 'granted'){
+      let result = await Location.getCurrentPositionAsync()
+      console.log(result)
+      if(result){
+        this.setState({
+          location: result
+        })
+      }
+    }
   }
   render () {
     // store the prop values that are passed
@@ -378,8 +395,29 @@ class Chat extends Component {
               <Text>Take photo</Text>
             </Pressable>
           </View>
+          {/* GET LOCATION */}
+          <View
+            style={[buttons.btnContainer, { backgroundColor: 'white' }]}
+          >
+            <Pressable
+              onPress={() => this.getLocation()}
+            >
+              <Text>Get location</Text>
+            </Pressable>
+          </View>
         </View>
         {/* MAIN UI */}
+        {/* //!TEST MAP VIEW */}
+        {this.state.location && <MapView
+          style={{width: 300, height: 300}}
+          region={{
+            latitude: this.state.location.coords.latitude,
+            longitude: this.state.location.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421
+          }}
+        />}
+        {/* //!TEST IMPORT IMAGE */}
         {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />}
         <GiftedChat
           showUserAvatar={true}
