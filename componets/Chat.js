@@ -153,17 +153,14 @@ class Chat extends Component {
   }
   // Iterates through message data stored in asyncStorage to return the user with the same name
   async findUser() {
-    await this.getMessages().then(() => {
-      if(messages = []){
-        return this.showToast('error', 'You are offline', 'No messages to show')
-      }
-    })
+    await this.getMessages()
     const { name } = this.props.route.params
     // Copy the AsyncStorage parsed array
     let messages = this.state.messages.map(user => {return user})
     // If the user had no messages saved error toast will show
     messages.map(message => {
-      if(message.user.name === name){
+      // console.log(message.user.name)
+      if(message.user.name === name && name !== ''){
         console.log(message.user.name)
         this.setState({
           user:{
@@ -173,6 +170,10 @@ class Chat extends Component {
           }
         })
         return console.log('found a match')
+      }
+      if(name === ''){
+        this.props.navigation.navigate('Start')
+        return this.showToast('error', 'Enter your name when offline')
       }
     })
   }
@@ -406,8 +407,6 @@ class Chat extends Component {
     const snapshot = await ref.put(blob)
     
     blob.close()
-    // this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', this.state.user._id)
-    // this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
     return await snapshot.ref.getDownloadURL()
   }
   // Main render 
