@@ -8,7 +8,7 @@ import * as Location from 'expo-location'
 import MapView from 'react-native-maps'
 
 // react native specific components
-import { StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text, Image } from 'react-native'
+import { Animated, StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text, Image } from 'react-native'
 
 // Gifted chat
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
@@ -32,6 +32,7 @@ import Toast from 'react-native-toast-message'
 
 // Components
 import CustomActions from './CustomActions'
+import Buttons from './Buttons'
 // If there is a firebase app initialized. Load it.
 if(!firebase.apps.length){
   // firebase.app()
@@ -122,6 +123,8 @@ class Chat extends Component {
           _id: data._id,
           text: data.text,
           createdAt: new Date(),
+          image: data.image || null,
+          location: data.location || null,
           user: {
             _id: data.user._id,
             name: data.user.name,
@@ -149,14 +152,16 @@ class Chat extends Component {
     }
   }
   // Iterates through message data stored in asyncStorage to return the user with the same name
-  findUser() {
+  async findUser() {
+    await this.getMessages().then(() => {
+      if(messages = []){
+        return this.showToast('error', 'You are offline', 'No messages to show')
+      }
+    })
     const { name } = this.props.route.params
     // Copy the AsyncStorage parsed array
     let messages = this.state.messages.map(user => {return user})
     // If the user had no messages saved error toast will show
-    if(messages = []){
-      return this.showToast('error', 'You are offline', 'No messages to show')
-    }
     messages.map(message => {
       if(message.user.name === name){
         console.log(message.user.name)
@@ -178,7 +183,6 @@ class Chat extends Component {
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     await this.checkInternet()
-    await this.getMessages()
     if(!this.state.isConnected){
       this.setState({
         messages: [
@@ -201,8 +205,10 @@ class Chat extends Component {
       
         ]
         })
-      return this.findUser()
+      return await this.findUser()
     }
+    await this.getMessages()
+    
     // Authenticate user
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
       try{
@@ -213,6 +219,7 @@ class Chat extends Component {
         this.setState({ user: { _id: message.uid, name: name, avatar: "https://placeimg.com/140/140/any"}})
         this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
         this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
+        await this.saveMessages()
         if(this.state.user.name === ''){
           // return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
         }
@@ -285,6 +292,7 @@ class Chat extends Component {
   async saveMessages(){
     try{
       await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages))
+        .then(() => this.showToast('success', 'Saved message to storage'))
     }catch(e){
       console.log('save message error')
     }
@@ -300,7 +308,9 @@ class Chat extends Component {
       _id: messages[0]._id,
       user: this.state.user,
       text: messages[0].text,
-      createdAt: messages[0].createdAt
+      createdAt: messages[0].createdAt,
+      image: this.state.image.url,
+      location: messages.location || null,
     })
   }
   // Pick an image from the user's device
@@ -317,9 +327,17 @@ class Chat extends Component {
         let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: 'Images'}).catch(error => console.log('launch image Lib Async error'))
         //? Update image state if request is not cancelled
         if(!result.cancelled){
+          console.log(result)
           this.setState({
-            image: result
+            image: {
+              height: result.height,
+              type: result.type,
+              uri: result.uri,
+              url: ''
+            }
           })
+          const URL = await this.uploadImageFetch(result.uri)
+          this.state.image.url = URL
         }
     }
   }
@@ -340,7 +358,13 @@ class Chat extends Component {
   }
   // Custom actions
   renderCustomActions = (props) => {
-    return <CustomActions {...props} />
+    return <CustomActions
+      // Add functions as props
+      getLocation={this.getLocation}
+      pickImage={this.pickImage} 
+      takePhoto={this.takePhoto}
+      {...props} 
+    />
   }
   // Get location
   getLocation = async() => {
@@ -357,55 +381,47 @@ class Chat extends Component {
       }
     }
   }
+  // uploadImageFetch takes a selected image's uri
+  uploadImageFetch = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response)
+      }
+      xhr.onerror = function (e) {
+        console.log(e)
+        reject(new TypeError("Network request failed"))
+      }
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true)
+      xhr.send(null)
+    })
+    // Runs while blob is working
+    const imageNameBefore = uri.split('/')
+    const imageName = imageNameBefore[imageNameBefore.length - 1]
+    // Reference to the image storage
+    // const ref = firebase.storage().ref().child(`gs://chat-app-8deeb.appspot.com/${imageName}`)
+    const ref = firebase.storage().ref().child(`images/${imageName}`)
+    
+    const snapshot = await ref.put(blob)
+    
+    blob.close()
+    // this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', this.state.user._id)
+    // this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
+    return await snapshot.ref.getDownloadURL()
+  }
+  // Main render 
   render () {
     // store the prop values that are passed
     const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
-        {/* FOR TESTING PURPOSES ONLY */}
-        <View style={buttons.container}>
-          {/* DELETE ASYNC STORAGE */}
-          <View
-            style={[buttons.btnContainer, { backgroundColor: 'white' }]}
-          >
-            <Pressable
-              onPress={() => this.deleteMessages()}
-              style={{}}
-            >
-              <Text>Delete storage</Text>
-            </Pressable>
-          </View>
-          {/* PICK IMAGE */}
-          <View
-            style={[buttons.btnContainer, { backgroundColor: 'white' }]}
-          >
-            <Pressable
-              onPress={this.pickImage}
-            >
-              <Text>Pick image</Text>
-            </Pressable>
-          </View>
-          {/* TAKE PHOTO */}
-          <View
-            style={[buttons.btnContainer, { backgroundColor: 'white' }]}
-          >
-            <Pressable
-              onPress={() => this.takePhoto()}
-            >
-              <Text>Take photo</Text>
-            </Pressable>
-          </View>
-          {/* GET LOCATION */}
-          <View
-            style={[buttons.btnContainer, { backgroundColor: 'white' }]}
-          >
-            <Pressable
-              onPress={() => this.getLocation()}
-            >
-              <Text>Get location</Text>
-            </Pressable>
-          </View>
-        </View>
+        {/* <Buttons
+          // Add functions as props
+          getLocation={this.getLocation}
+          pickImage={this.pickImage} 
+          takePhoto={this.takePhoto}
+        /> */}
         {/* MAIN UI */}
         {/* //!TEST MAP VIEW */}
         {this.state.location && <MapView
@@ -418,7 +434,7 @@ class Chat extends Component {
           }}
         />}
         {/* //!TEST IMPORT IMAGE */}
-        {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />}
+        {/* {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />} */}
         <GiftedChat
           showUserAvatar={true}
           renderBubble={this.renderBubble.bind(this)}
@@ -446,21 +462,5 @@ export default Chat
 const view = StyleSheet.create({
   outer: {
     flex: 1
-  }
-})
-
-const buttons = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    // justifyContent: 'space-around',
-    marginTop: 30
-  },
-  btnContainer:{
-    height: 60,
-    width: '34%',
-    flex:1,
-    alignItems:'center',
-    justifyContent:'center'
   }
 })
