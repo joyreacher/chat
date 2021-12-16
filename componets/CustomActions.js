@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { useEffect } from "react"
 import { ActionSheetIOS, StyleSheet, TouchableHighlight, Text, View } from 'react-native'
-function CustomActions() {
+function CustomActions({pickImage, takePhoto, getLocation}) {
   const onActionPress = () =>{
     const options = [
       'Choose From Library',
@@ -19,13 +19,13 @@ function CustomActions() {
         switch(buttonIndex){
           case 0:
             console.log('pick image')
-            return
+            return await pickImage()
           case 1:
             console.log('take photo')
-            return
+            return await takePhoto()
           case 2:
             console.log('get location')
-            return 
+            return await getLocation()
           default:
         }
       }
