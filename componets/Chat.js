@@ -33,29 +33,26 @@ import Toast from 'react-native-toast-message'
 // Components
 import CustomActions from './CustomActions'
 import Buttons from './Buttons'
-// If there is a firebase app initialized. Load it.
-if(!firebase.apps.length){
-  // firebase.app()
-  firebase.initializeApp(FireBaseConfig)
-}
-//  else{
-//   // If there is NOT a firebase app initialized. Initialize it.
-//   firebase.initializeApp(FireBaseConfig)
-// }
-
-// Check users internet connection using NetINfo
-
 class Chat extends Component {
   constructor (props) {
     super(props)
+    // Initialize Firebase
+    if(!firebase.apps.length){
+      // firebase.app()
+      firebase.initializeApp(FireBaseConfig)
+    }
+    // Add observer
+    this.referenceMessagesUser = firebase.firestore().collection('messages')
+    // Initialize state
     this.state = {
-      location: null,
+      messages: [],
+      uid: 0,
+      isConnected: Boolean,
       image: null,
+
+      location: null,
       _isMounted: Boolean,
       status: '...',
-      messages: [],
-      botMessages: [],
-      isConnected: Boolean,
       user: {
         _id: '',
         name: '',
@@ -219,7 +216,6 @@ class Chat extends Component {
           return await Promise.resolve(firebase.auth().signInAnonymously())
         }
         this.setState({ user: { _id: message.uid, name: name, avatar: "https://placeimg.com/140/140/any"}})
-        this.referenceMessagesUser = firebase.firestore().collection('messages').where('uid', '==', message.uid)
         this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
         await this.saveMessages()
         if(this.state.user.name === ''){
