@@ -49,6 +49,7 @@ class Chat extends Component {
   constructor (props) {
     super(props)
     this.state = {
+      location: null,
       image: null,
       _isMounted: Boolean,
       status: '...',
@@ -310,8 +311,8 @@ class Chat extends Component {
       user: this.state.user,
       text: messages[0].text,
       createdAt: messages[0].createdAt,
-      image: this.state.image.url,
-      location: messages.location || null,
+      image: this.state.image.uri || null,
+      location: this.state.location || null,
     })
   }
   // Pick an image from the user's device
@@ -377,7 +378,10 @@ class Chat extends Component {
       console.log(result)
       if(result){
         this.setState({
-          location: result
+          location: {
+            lat: result.coords.latitude,
+            long: result.coords.longitude
+          }
         })
       }
     }
@@ -444,6 +448,15 @@ class Chat extends Component {
           }
           renderInputToolbar={messages => this.renderInputToolBar(messages)}
           renderActions={() => this.renderCustomActions()}
+          renderCustomView={() => {return this.state.location && <MapView
+            style={{width: 150, height: 150}}
+            region={{
+              latitude: this.state.location.lat,
+              longitude: this.state.location.long,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421
+            }}
+          />}}
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
