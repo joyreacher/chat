@@ -60,6 +60,40 @@ class Chat extends Component {
       }
     }
   }
+  // Gets messages from asyncStorage (local storage for mobile devices)
+  async getMessages(){
+    let messages = ''
+    try{
+      messages = await AsyncStorage.getItem('messages') || []
+      this.setState({
+        messages: JSON.parse(messages)
+      })
+    }catch(e){
+      // this.showToast('error', 'No messages for user')
+      console.log('getMessages() errorr')
+      console.log(e.messages)
+    }
+  }
+  // Function saves message data to AsyncStorage as a string
+  async saveMessages(){
+    try{
+      await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages))
+        .then(() => this.showToast('success', 'Saved message to storage'))
+    }catch(e){
+      console.log('save message error')
+    }
+  }
+  // Function deletes message data saved to AsyncStorage as a string
+  async deleteMessages(){
+    try{
+      await AsyncStorage.removeItem('messages')
+      this.setState({
+        messages:[]
+      })
+    }catch(e){
+      console.log('delete message error')
+    }
+  }
   // Show react toast message 
   showToast = async (type, text1, text2) => {
     Toast.show({
@@ -134,20 +168,6 @@ class Chat extends Component {
     return this.setState({
       messages,
     }) 
-  }
-  // Gets messages from asyncStorage (local storage for mobile devices)
-  async getMessages(){
-    let messages = ''
-    try{
-      messages = await AsyncStorage.getItem('messages') || []
-      this.setState({
-        messages: JSON.parse(messages)
-      })
-    }catch(e){
-      // this.showToast('error', 'No messages for user')
-      console.log('getMessages() errorr')
-      console.log(e.messages)
-    }
   }
   // Iterates through message data stored in asyncStorage to return the user with the same name
   async findUser() {
@@ -273,26 +293,6 @@ class Chat extends Component {
           {...props}
         />
       )
-    }
-  }
-  // Function deletes message data saved to AsyncStorage as a string
-  async deleteMessages(){
-    try{
-      await AsyncStorage.removeItem('messages')
-      this.setState({
-        messages:[]
-      })
-    }catch(e){
-      console.log('delete message error')
-    }
-  }
-  // Function saves message data to AsyncStorage as a string
-  async saveMessages(){
-    try{
-      await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages))
-        .then(() => this.showToast('success', 'Saved message to storage'))
-    }catch(e){
-      console.log('save message error')
     }
   }
   // Adds messages to messages state using GiftedChat | referanceMessages is used to write messages to firebase
