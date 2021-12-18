@@ -42,7 +42,7 @@ class Chat extends Component {
       firebase.initializeApp(FireBaseConfig)
     }
     // Add observer
-    this.referenceMessagesUser = firebase.firestore().collection('messages')
+    this.referenceMessages = firebase.firestore().collection('messages')
     const { name } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     // Initialize state
@@ -63,6 +63,7 @@ class Chat extends Component {
     }
     this.checkInternet()
   }
+  /** GET, SAVE, DELETE METHODS */
   // Gets messages from asyncStorage (local storage for mobile devices)
   async getMessages(){
     let messages = ''
@@ -202,9 +203,8 @@ class Chat extends Component {
   // Loads and filters asyncStorage data if not
   async componentDidMount () {
     this.setState({_isMounted: true})
-    const { name } = this.props.route.params
-    this.props.navigation.setOptions({ title: name })
-    await this.checkInternet()
+    // TODO: RESTRUCTURE FUNCTION TO CHECK FOR TRUE CONDITION ON isConnected
+    // TODO: AND PUT THE authUnsubscribe INSIDE IT
     if(!this.state.isConnected){
       this.setState({
         messages: [
@@ -232,19 +232,24 @@ class Chat extends Component {
     await this.getMessages()
     
     // Authenticate user
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (message) => {
+    this.authUnsubscribe = firebase
+      .auth()
+      .onAuthStateChanged(async (message) => {
       try{
         // await this.showToast('info', 'Authenticating')
         if (!message) {
           return await Promise.resolve(firebase.auth().signInAnonymously())
         }
-        this.setState({ user: { _id: message.uid, name: name, avatar: "https://placeimg.com/140/140/any"}})
-        this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate) 
-        await this.saveMessages()
-        if(this.state.user.name === ''){
-          // return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
-        }
-        // this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
+        // this.setState({ user: { _id: message.uid, name: name, avatar: "https://placeimg.com/140/140/any"}})
+        this.unsubscribeMessagesUser = this.referenceMessages
+          .orderBy('createdAt', 'desc')
+          .onSnapshot(this.onCollectionUpdate)
+          
+        //TODO CREATE A SEPERTE FUNCTION FOR DETECTING USER'S NAME OR IMPLEMNT INPUT VALIDATION
+        // if(this.state.user.name === ''){
+        //   // return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
+        // }
+        // // this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
       }catch(e){
         this.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
       }
@@ -301,18 +306,22 @@ class Chat extends Component {
   // Adds messages to messages state using GiftedChat | referanceMessages is used to write messages to firebase
   async onSend(messages = []){
     // messages state will contain the most recent message -- the thread will be stored in AsyncStorage
-    this.setState(previousState => ({ messages: GiftedChat.append(previousState.messages, messages) }), () => { this.saveMessages() })
-    this.referenceMessages = firebase.firestore().collection('messages')
-    await this.referenceMessages.add({
-      // set uid to reference a user's message
-      uid: this.state.user._id,
-      _id: messages[0]._id,
-      user: this.state.user,
-      text: messages[0].text,
-      createdAt: messages[0].createdAt,
-      image: this.state.image.uri || null,
-      location: this.state.location || null,
-    })
+    this.setState(previousState => ({ messages: GiftedChat.append(previousState.messages, messages) }),
+                  async () => {
+                    await this.referenceMessages.add({
+                      // set uid to reference a user's message
+                      uid: this.state.user._id,
+                      _id: messages[0]._id,
+                      user: this.state.user,
+                      text: messages[0].text,
+                      createdAt: messages[0].createdAt,
+                      image: messages[0].image || null,
+                      location: this.state.location || null,
+                    })
+                    this.saveMessages()
+                    })
+    // this.referenceMessages = firebase.firestore().collection('messages')
+    
   }
   // Pick an image from the user's device
   pickImage = async () => {
@@ -328,17 +337,15 @@ class Chat extends Component {
         let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: 'Images'}).catch(error => console.log('launch image Lib Async error'))
         //? Update image state if request is not cancelled
         if(!result.cancelled){
-          console.log(result)
+          const URL = await this.uploadImageFetch(result.uri)
           this.setState({
             image: {
               height: result.height,
               type: result.type,
               uri: result.uri,
-              url: ''
+              url: URL
             }
           })
-          const URL = await this.uploadImageFetch(result.uri)
-          this.state.image.url = URL
         }
     }
   }
@@ -418,12 +425,13 @@ class Chat extends Component {
     const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
-        {/* <Buttons
+        <Buttons
           // Add functions as props
           getLocation={this.getLocation}
           pickImage={this.pickImage} 
           takePhoto={this.takePhoto}
-        /> */}
+          deleteMessages={this.deleteMessages}
+        />
         {/* MAIN UI */}
         {/* //!TEST MAP VIEW */}
         {this.state.location && <MapView
