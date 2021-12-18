@@ -43,6 +43,8 @@ class Chat extends Component {
     }
     // Add observer
     this.referenceMessagesUser = firebase.firestore().collection('messages')
+    const { name } = this.props.route.params
+    this.props.navigation.setOptions({ title: name })
     // Initialize state
     this.state = {
       messages: [],
@@ -55,10 +57,11 @@ class Chat extends Component {
       status: '...',
       user: {
         _id: '',
-        name: '',
+        name: name,
         avatar:''
       }
     }
+    this.checkInternet()
   }
   // Gets messages from asyncStorage (local storage for mobile devices)
   async getMessages(){
