@@ -231,29 +231,32 @@ class Chat extends Component {
     }
     await this.getMessages()
     
+    if(this.state.isConnected){
     // Authenticate user
     this.authUnsubscribe = firebase
-      .auth()
-      .onAuthStateChanged(async (message) => {
-      try{
-        // await this.showToast('info', 'Authenticating')
-        if (!message) {
-          return await Promise.resolve(firebase.auth().signInAnonymously())
+        .auth()
+        .onAuthStateChanged(async (message) => {
+        try{
+          // await this.showToast('info', 'Authenticating')
+          if (!message) {
+            return await Promise.resolve(firebase.auth().signInAnonymously())
+          }
+          console.log(this.state.name)
+          this.setState({ user: { _id: message.uid, name: this.state.name, avatar: "https://placeimg.com/140/140/any"}})
+          this.unsubscribeMessagesUser = this.referenceMessages
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(this.onCollectionUpdate)
+            
+          //TODO CREATE A SEPERTE FUNCTION FOR DETECTING USER'S NAME OR IMPLEMNT INPUT VALIDATION
+          // if(this.state.user.name === ''){
+          //   // return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
+          // }
+          // // this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
+        }catch(e){
+          this.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
         }
-        // this.setState({ user: { _id: message.uid, name: name, avatar: "https://placeimg.com/140/140/any"}})
-        this.unsubscribeMessagesUser = this.referenceMessages
-          .orderBy('createdAt', 'desc')
-          .onSnapshot(this.onCollectionUpdate)
-          
-        //TODO CREATE A SEPERTE FUNCTION FOR DETECTING USER'S NAME OR IMPLEMNT INPUT VALIDATION
-        // if(this.state.user.name === ''){
-        //   // return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
-        // }
-        // // this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
-      }catch(e){
-        this.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
-      }
-    })
+      })
+    }
   }
   // Terminates observers and asyncronus functions
   componentWillUnmount() {
