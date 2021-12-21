@@ -57,11 +57,22 @@ class Chat extends Component {
       status: '...',
       user: {
         _id: '',
-        name: name,
+        name: '',
         avatar:''
       }
     }
     this.checkInternet()
+  }
+  // Set user
+  setUser(){
+    const { name } = this.props.route.params
+    this.setState({
+      user: {
+        _id: '',
+        name: name,
+        avatar:''
+      }
+    })
   }
   /** GET, SAVE, DELETE METHODS */
   // Gets messages from asyncStorage (local storage for mobile devices)
@@ -241,8 +252,8 @@ class Chat extends Component {
           if (!message) {
             return await Promise.resolve(firebase.auth().signInAnonymously())
           }
-          console.log(this.state.name)
-          this.setState({ user: { _id: message.uid, name: this.state.name, avatar: "https://placeimg.com/140/140/any"}})
+          // this.setState({ user: { _id: message.uid, avatar: "https://placeimg.com/140/140/any"}})
+          this.setUser()
           this.unsubscribeMessagesUser = this.referenceMessages
             .orderBy('createdAt', 'desc')
             .onSnapshot(this.onCollectionUpdate)
