@@ -217,8 +217,6 @@ class Chat extends Component {
   // Loads and filters asyncStorage data if not
   componentDidMount () {
     this.setState({_isMounted: true})
-    // TODO: RESTRUCTURE FUNCTION TO CHECK FOR TRUE CONDITION ON isConnected
-    // TODO: AND PUT THE authUnsubscribe INSIDE IT
     if(!this.state.isConnected){
       this.setState({
         messages: [
@@ -378,12 +376,10 @@ class Chat extends Component {
    */
   takePhoto = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync()
-    console.log(status)
     if (status === 'granted') {
       let result = await ImagePicker.launchCameraAsync({mediaTypes: 'Images',}).catch(error => console.log(error));
       if (!result.cancelled) {
         const URL = await this.uploadImageFetch(result.uri)
-        console.log(URL)
         this.onSend({
           _id: Math.round(Math.random() * 1000000),
           image: URL,
@@ -396,10 +392,8 @@ class Chat extends Component {
   getLocation = async() => {
     // const { status } = await Permissions.askAsync(Permissions.LOCATION_FOREGROUND)
     const { status } = await Location.requestForegroundPermissionsAsync()
-    console.log(status)
     if(status === 'granted'){
       let result = await Location.getCurrentPositionAsync()
-      console.log(result)
       if(result){
         this.setState({
           location: {
