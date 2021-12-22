@@ -337,7 +337,7 @@ class Chat extends Component {
   }
   /**
    * @function onSend
-   * @returns 
+   * @returns message data
    */
   onSend = (messages = []) => {
     this.setState(
@@ -350,8 +350,11 @@ class Chat extends Component {
     }
   )}
 
-  // Pick an image from the user's device
-  pickImage = async (messages=[]) => {
+  /**
+   * @function pickImage
+   * @returns message data with image url
+   */
+  pickImage = async () => {
     // Ask permission
     const { status }  = await Camera.requestCameraPermissionsAsync()
     //? if permission IS granted
