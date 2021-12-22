@@ -64,13 +64,13 @@ class Chat extends Component {
     this.checkInternet()
   }
   // Set user
-  setUser(){
+  setUser(uid, avatar){
     const { name } = this.props.route.params
     this.setState({
       user: {
-        _id: '',
+        _id: uid,
         name: name,
-        avatar:''
+        avatar:avatar
       }
     })
   }
@@ -126,6 +126,9 @@ class Chat extends Component {
             isConnected: true,
             status: 'now online'
           })
+          this.unsubscribe = this.referenceMessages
+            .orderBy("createdAt", "desc")
+            .onSnapshot(this.onCollectionUpdate);
           return true
         } else {
           this.showToast('error', "You have lost internet connection", "Enter your name on start screen to retrieve messages in storage")
@@ -169,7 +172,7 @@ class Chat extends Component {
           uid: data.uid,
           _id: data._id,
           text: data.text,
-          createdAt: new Date(),
+          createdAt: data.createdAt.toDate(),
           image: data.image || null,
           location: data.location || null,
           user: {
@@ -212,20 +215,14 @@ class Chat extends Component {
   }
   // Authenticates the user if there is an internet connection
   // Loads and filters asyncStorage data if not
-  async componentDidMount () {
+  componentDidMount () {
     this.setState({_isMounted: true})
     // TODO: RESTRUCTURE FUNCTION TO CHECK FOR TRUE CONDITION ON isConnected
     // TODO: AND PUT THE authUnsubscribe INSIDE IT
     if(!this.state.isConnected){
       this.setState({
         messages: [
-        {
-          _id: 2,
-          text: 'Hello ' + name + ' you are ' + this.state.status,
-          createAt: new Date(),
-          system: true
-        },
-        {
+          {
           _id: Math.round(Math.random() * 1000000),
           text:"Hello you are " + this.state.status,
           createdAt: new Date(),
@@ -235,12 +232,19 @@ class Chat extends Component {
             avatar: 'https://placeimg.com/140/140/any'
           },
         },
-      
+          {
+          _id: 2,
+          text: 'Hello ' + name + ' you are ' + this.state.status,
+          createAt: new Date(),
+          system: true
+        
+          }
+          
         ]
         })
-      return await this.findUser()
+      return this.findUser()
     }
-    await this.getMessages()
+    this.getMessages()
     
     if(this.state.isConnected){
     // Authenticate user
@@ -253,7 +257,7 @@ class Chat extends Component {
             return await Promise.resolve(firebase.auth().signInAnonymously())
           }
           // this.setState({ user: { _id: message.uid, avatar: "https://placeimg.com/140/140/any"}})
-          this.setUser()
+          this.setUser(message.uid, "https://placeimg.com/140/140/any")
           this.unsubscribeMessagesUser = this.referenceMessages
             .orderBy('createdAt', 'desc')
             .onSnapshot(this.onCollectionUpdate)
@@ -274,6 +278,7 @@ class Chat extends Component {
     this.setState({_isMounted: false})
     // Stop listening to authentication and collection changes
     this.referenceMessagesUser
+    this.authUnsubscribe
     this.unsubscribeMessagesUser
     this.referenceMessages
     
@@ -317,32 +322,36 @@ class Chat extends Component {
       )
     }
   }
-  // Adds messages to messages state using GiftedChat | referanceMessages is used to write messages to firebase
-  async onSend(messages = []){
-    // messages state will contain the most recent message -- the thread will be stored in AsyncStorage
-    this.setState(previousState => ({ messages: GiftedChat.append(previousState.messages, messages) }),
-                  async () => {
-                    await this.referenceMessages.add({
-                      // set uid to reference a user's message
-                      uid: this.state.user._id,
-                      _id: messages[0]._id,
-                      user: this.state.user,
-                      text: messages[0].text,
-                      createdAt: messages[0].createdAt,
-                      image: messages[0].image || null,
-                      location: this.state.location || null,
-                    })
-                    this.saveMessages()
-                    })
-    // this.referenceMessages = firebase.firestore().collection('messages')
-    
+  addMessage = async () =>{
+    const messages = this.state.messages[0]
+    await this.referenceMessages.add({
+    // // // //   // set uid to reference a user's message
+      uid: this.state.user._id,
+      _id: messages._id,
+      user: this.state.user,
+      text: messages.text || '',
+      createdAt: new Date(),
+      image: messages.image || null,
+      location: this.state.location || null,
+    })
   }
+  /**
+   * @function onSend
+   * @returns 
+   */
+  onSend = (messages = []) => {
+    this.setState(
+    (previousState) => ({
+      messages: GiftedChat.append(previousState.messages, messages),
+    }),
+    async () => {
+      await this.addMessage();
+      this.saveMessages();
+    }
+  )}
+
   // Pick an image from the user's device
-  pickImage = async () => {
-    /*
-      ? launchImageLibraryAsync returns object containing uri
-      ? cancelled which is true if the user cancels the process and doesnt pick a file
-    */
+  pickImage = async (messages=[]) => {
     // Ask permission
     const { status }  = await Camera.requestCameraPermissionsAsync()
     //? if permission IS granted
@@ -352,14 +361,11 @@ class Chat extends Component {
         //? Update image state if request is not cancelled
         if(!result.cancelled){
           const URL = await this.uploadImageFetch(result.uri)
-          this.setState({
-            image: {
-              height: result.height,
-              type: result.type,
-              uri: result.uri,
-              url: URL
-            }
-          })
+          this.onSend({
+            _id: Math.round(Math.random() * 1000000),
+            image: URL,
+            user: this.state.user
+          });
         }
     }
   }
@@ -439,13 +445,13 @@ class Chat extends Component {
     const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
-        <Buttons
+        {/* <Buttons
           // Add functions as props
           getLocation={this.getLocation}
           pickImage={this.pickImage} 
           takePhoto={this.takePhoto}
           deleteMessages={this.deleteMessages}
-        />
+        /> */}
         {/* MAIN UI */}
         {/* //!TEST MAP VIEW */}
         {this.state.location && <MapView
@@ -458,7 +464,7 @@ class Chat extends Component {
           }}
         />}
         {/* //!TEST IMPORT IMAGE */}
-        {/* {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />} */}
+        {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />}
         <GiftedChat
           showUserAvatar={true}
           renderBubble={this.renderBubble.bind(this)}
@@ -468,7 +474,7 @@ class Chat extends Component {
             this.state.user
           }
           renderInputToolbar={messages => this.renderInputToolBar(messages)}
-          renderActions={() => this.renderCustomActions()}
+          renderActions={this.renderCustomActions}
           renderCustomView={() => {return this.state.location && <MapView
             style={{width: 150, height: 150}}
             region={{
