@@ -8,7 +8,7 @@ import * as Location from 'expo-location'
 import MapView from 'react-native-maps'
 
 // react native specific components
-import { Animated, StyleSheet, Platform, View, Pressable, KeyboardAvoidingView, Text, Image } from 'react-native'
+import { StyleSheet, Platform, View, KeyboardAvoidingView, Text,  ActivityIndicator} from 'react-native'
 
 // Gifted chat
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat'
@@ -447,6 +447,17 @@ class Chat extends Component {
     blob.close()
     return await snapshot.ref.getDownloadURL()
   }
+  loading = () => {
+    const { color } = this.props.route.params
+    return (
+      <View style={{height: 900, backgroundColor: 'red'}}>
+        <Text>
+          wtf
+        </Text>
+        <ActivityIndicator size='large' color={color}/>
+      </View>
+    )
+  }
   // Main render 
   render () {
     // store the prop values that are passed
@@ -476,22 +487,16 @@ class Chat extends Component {
         <GiftedChat
           showUserAvatar={true}
           renderBubble={this.renderBubble.bind(this)}
-          messages={this.state.messages}
+          messages={!this.state.messages ? <ActivityIndicator size='large' color={color}/> : this.state.messages}
           onSend={messages => this.onSend(messages)}
+          renderLoading={() => this.loading()}
           user={
             this.state.user
           }
           renderInputToolbar={messages => this.renderInputToolBar(messages)}
           renderActions={this.renderCustomActions}
-          renderCustomView={() => {return this.state.location && <MapView
-            style={{width: 150, height: 150}}
-            region={{
-              latitude: this.state.location.lat,
-              longitude: this.state.location.long,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421
-            }}
-          />}}
+          renderCustomView={this.renderCustomView}
+          
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
