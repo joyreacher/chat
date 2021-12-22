@@ -490,6 +490,7 @@ class Chat extends Component {
           messages={!this.state.messages ? <ActivityIndicator size='large' color={color}/> : this.state.messages}
           onSend={messages => this.onSend(messages)}
           renderLoading={() => this.loading()}
+          renderUsernameOnMessage={true}
           user={
             this.state.user
           }
