@@ -373,16 +373,18 @@ class Chat extends Component {
     }
   }
   // Take a photo with users device
-  async takePhoto() {
+  takePhoto = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync()
     console.log(status)
     if (status === 'granted') {
-      let result = await ImagePicker.launchCameraAsync({
-        mediaTypes: 'Images',
-      }).catch(error => console.log(error));
+      let result = await ImagePicker.launchCameraAsync({mediaTypes: 'Images',}).catch(error => console.log(error));
       if (!result.cancelled) {
-        this.setState({
-          image: result
+        const URL = await this.uploadImageFetch(result.uri)
+        console.log(URL)
+        this.onSend({
+          _id: Math.round(Math.random() * 1000000),
+          image: URL,
+          user: this.state.user
         });
       }
     }
