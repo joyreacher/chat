@@ -372,7 +372,10 @@ class Chat extends Component {
         }
     }
   }
-  // Take a photo with users device
+  /**
+   *@function takePhoto
+   *@returns URL of an image the user has taken
+   */
   takePhoto = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync()
     console.log(status)
