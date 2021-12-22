@@ -392,16 +392,6 @@ class Chat extends Component {
       }
     }
   }
-  // Custom actions
-  renderCustomActions = (props) => {
-    return <CustomActions
-      // Add functions as props
-      getLocation={this.getLocation}
-      pickImage={this.pickImage} 
-      takePhoto={this.takePhoto}
-      {...props} 
-    />
-  }
   // Get location
   getLocation = async() => {
     // const { status } = await Permissions.askAsync(Permissions.LOCATION_FOREGROUND)
@@ -419,6 +409,16 @@ class Chat extends Component {
         })
       }
     }
+  }
+  // Custom actions
+  renderCustomActions = (props) => {
+    return <CustomActions
+      // Add functions as props
+      getLocation={this.getLocation}
+      pickImage={this.pickImage} 
+      takePhoto={this.takePhoto}
+      {...props} 
+    />
   }
   // uploadImageFetch takes a selected image's uri
   uploadImageFetch = async (uri) => {
