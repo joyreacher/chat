@@ -484,17 +484,17 @@ class Chat extends Component {
         /> */}
         {/* MAIN UI */}
         {/* //!TEST MAP VIEW */}
-        {this.state.location && <MapView
+        {/* {this.state.location && <MapView
           style={{width: 300, height: 300}}
           region={{
-            latitude: this.state.location.coords.latitude,
-            longitude: this.state.location.coords.longitude,
+            latitude: this.state.location.lat,
+            longitude: this.state.location.long,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421
           }}
-        />}
+        />} */}
         {/* //!TEST IMPORT IMAGE */}
-        {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />}
+        {/* {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />} */}
         <GiftedChat
           showUserAvatar={true}
           renderBubble={this.renderBubble.bind(this)}
