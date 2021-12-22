@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React, { useEffect } from "react"
 import { ActionSheetIOS, StyleSheet, TouchableHighlight, Text, View } from 'react-native'
 function CustomActions({pickImage, takePhoto, getLocation}) {
-  const onActionPress = () =>{
+  onActionPress = () =>{
     const options = [
       'Choose From Library',
       'Take Picture',
@@ -34,7 +34,7 @@ function CustomActions({pickImage, takePhoto, getLocation}) {
   return (
     <>
       <TouchableHighlight
-        onPress={() => onActionPress()}
+        onPress={this.onActionPress}
         style={styles.container}
       >
         <View style={styles.wrapper}>
