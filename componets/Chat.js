@@ -459,11 +459,13 @@ class Chat extends Component {
     return null;
   }
   loading = () => {
-    const { color } = this.props.route.params
+    const { color, textColor } = this.props.route.params
     return (
-      <View style={{height: 900, backgroundColor: 'red'}}>
-        <Text>
-          wtf
+      <View style={[loadingView.outer, {
+          backgroundColor: !color ? 'white' : color ,
+          } ] }>
+        <Text style={[loadingView.outer, {color: `hsl(${textColor})`}]}>
+          Loading ..
         </Text>
         <ActivityIndicator size='large' color={color}/>
       </View>
@@ -500,7 +502,7 @@ class Chat extends Component {
           renderBubble={this.renderBubble.bind(this)}
           messages={!this.state.messages ? <ActivityIndicator size='large' color={color}/> : this.state.messages}
           onSend={messages => this.onSend(messages)}
-          renderLoading={() => this.loading()}
+          renderLoading={this.loading}
           renderUsernameOnMessage={true}
           user={
             this.state.user
@@ -526,5 +528,20 @@ export default Chat
 const view = StyleSheet.create({
   outer: {
     flex: 1
+  }
+})
+
+const loadingView = StyleSheet.create({
+  outer: {
+    flex:1,
+    // backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 1900,
+    fontSize: 64,
+  },
+  text: {
+    fontSize: 174,
+    color: 'white'
   }
 })
