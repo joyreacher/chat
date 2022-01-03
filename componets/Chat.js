@@ -27,8 +27,6 @@ import reactotron from 'reactotron-react-native'
 // Firestore credentials
 import FireBaseConfig from '../firestore/config'
 
-//React Toast
-import Toast from 'react-native-toast-message'
 
 // Components
 import CustomActions from './CustomActions'
@@ -43,7 +41,7 @@ class Chat extends Component {
     }
     // Add observer
     this.referenceMessages = firebase.firestore().collection('messages')
-    const { name } = this.props.route.params
+    const { name, showToast } = this.props.route.params
     this.props.navigation.setOptions({ title: name })
     // Initialize state
     this.state = {
@@ -51,7 +49,7 @@ class Chat extends Component {
       uid: 0,
       isConnected: Boolean,
       image: null,
-
+      showToast: showToast,
       location: null,
       _isMounted: Boolean,
       status: '...',
@@ -84,18 +82,16 @@ class Chat extends Component {
         messages: JSON.parse(messages)
       })
     }catch(e){
-      // this.showToast('error', 'No messages for user')
-      console.log('getMessages() errorr')
-      console.log(e.messages)
+      this.state.showToast('error', 'No messages for user')
     }
   }
   // Function saves message data to AsyncStorage as a string
   async saveMessages(){
     try{
       await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages))
-        .then(() => this.showToast('success', 'Saved message to storage'))
+        .then(() => this.stat.showToast('success', 'Saved message to storage'))
     }catch(e){
-      console.log('save message error')
+      this.state.showToast('info', 'No messages for user')
     }
   }
   // Function deletes message data saved to AsyncStorage as a string
@@ -106,16 +102,8 @@ class Chat extends Component {
         messages:[]
       })
     }catch(e){
-      console.log('delete message error')
+      this.state.showToast('error', 'Could not delete messages')
     }
-  }
-  // Show react toast message 
-  showToast = async (type, text1, text2) => {
-    Toast.show({
-      type: type,
-      text1:text1,
-      text2: text2
-    })
   }
   // Checks internet connection | returns isConnected State w/Bool
   async checkInternet(){
@@ -131,7 +119,7 @@ class Chat extends Component {
             .onSnapshot(this.onCollectionUpdate);
           return true
         } else {
-          this.showToast('error', "You have lost internet connection", "Enter your name on start screen to retrieve messages in storage")
+          this.state.showToast('error', "You have lost internet connection 🤔 ") 
           this.setState({
             isConnected: false,
             status: 'now offline'
@@ -209,7 +197,7 @@ class Chat extends Component {
       }
       if(name === ''){
         this.props.navigation.navigate('Start')
-        return this.showToast('error', 'Enter your name when offline')
+        return this.state.showToast('error', 'Enter your name when offline')
       }
     })
   }
@@ -250,8 +238,8 @@ class Chat extends Component {
         .auth()
         .onAuthStateChanged(async (message) => {
         try{
-          // await this.showToast('info', 'Authenticating')
           if (!message) {
+            await this.state.showToast('info', 'Authenticating')
             return await Promise.resolve(firebase.auth().signInAnonymously())
           }
           // this.setState({ user: { _id: message.uid, avatar: "https://placeimg.com/140/140/any"}})
@@ -259,14 +247,9 @@ class Chat extends Component {
           this.unsubscribeMessagesUser = this.referenceMessages
             .orderBy('createdAt', 'desc')
             .onSnapshot(this.onCollectionUpdate)
-            
-          //TODO CREATE A SEPERTE FUNCTION FOR DETECTING USER'S NAME OR IMPLEMNT INPUT VALIDATION
-          // if(this.state.user.name === ''){
-          //   // return this.showToast('success', `👍 Hello`, "Enter your name on Start screen to see stored messages")
-          // }
-          // // this.showToast('success', `👍 Hello ${this.state.user.name}`, "Turn off internet to see stored messages")
+          this.state.showToast('success', `📣 Hello ${this.state.user.name} 👏`, "Turn off internet to see stored messages")
         }catch(e){
-          this.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
+          this.state.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
         }
       })
     }
