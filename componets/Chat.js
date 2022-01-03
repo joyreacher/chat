@@ -22,7 +22,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // NetInfo
 import NetInfo from '@react-native-community/netinfo'
-import reactotron from 'reactotron-react-native'
 
 // Firestore credentials
 import FireBaseConfig from '../firestore/config'
@@ -30,7 +29,6 @@ import FireBaseConfig from '../firestore/config'
 
 // Components
 import CustomActions from './CustomActions'
-import Buttons from './Buttons'
 class Chat extends Component {
   constructor (props) {
     super(props)
@@ -460,26 +458,6 @@ class Chat extends Component {
     const { color } = this.props.route.params
     return (
       <View style={[{ backgroundColor: color }, view.outer]}>
-        {/* <Buttons
-          // Add functions as props
-          getLocation={this.getLocation}
-          pickImage={this.pickImage} 
-          takePhoto={this.takePhoto}
-          deleteMessages={this.deleteMessages}
-        /> */}
-        {/* MAIN UI */}
-        {/* //!TEST MAP VIEW */}
-        {/* {this.state.location && <MapView
-          style={{width: 300, height: 300}}
-          region={{
-            latitude: this.state.location.lat,
-            longitude: this.state.location.long,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421
-          }}
-        />} */}
-        {/* //!TEST IMPORT IMAGE */}
-        {/* {this.state.image && <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />} */}
         <GiftedChat
           showUserAvatar={true}
           renderBubble={this.renderBubble.bind(this)}
@@ -517,7 +495,6 @@ const view = StyleSheet.create({
 const loadingView = StyleSheet.create({
   outer: {
     flex:1,
-    // backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     height: 1900,
