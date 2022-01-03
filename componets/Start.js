@@ -67,7 +67,14 @@ class Start extends Component {
     if(!this.state.name){
       return this.showToast('error', 'Please enter your name')
     }
-    this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor, textColor: this.state.textColor, isConnected: this.state.isConnected})
+    this.props.navigation.navigate('Chat', {
+      name: this.state.name,
+      color: this.state.color,
+      contrastColor: this.state.contrastColor, 
+      textColor: this.state.textColor, 
+      isConnected: this.state.isConnected,
+      showToast: this.showToast
+      })
   }
   render() {
     return (
@@ -140,8 +147,6 @@ class Start extends Component {
               style={[styles.button, {backgroundColor: this.state.color === '#FFFFFF' ? '#757082' : this.state.color}]}
               onPress={() => {
                 this.handleButtonPress()
-                // Send name and color state as props to chat - Send Contrast color state for user's message bubbles
-                // this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor, textColor: this.state.textColor, isConnected: this.state.isConnected})
                 }
               }>
                 <Text
