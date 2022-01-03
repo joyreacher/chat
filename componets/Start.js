@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, TextInput, Pressable, KeyboardAvoidingView} from 'react-native';
+//React Toast
+import Toast from 'react-native-toast-message'
 // background image
 const image = require('../assets/project_assets/bg.png')
 
@@ -26,11 +28,10 @@ class Start extends Component {
       }
     }
   }
-  /** 
-    - handleColorSelection(color) takes a color hex value and sets the
-      empty color state to pass to Chat.js
-    - Sets bubble color of user's messages in the Chat screen
-    - Overrides the default state
+  /**
+   * 
+   * @param {string} colorSelection 
+   * @returns Color values based on contrast accessability tool
    */
   handleColorSelection = (colorSelection) => {
     switch (colorSelection){
@@ -45,6 +46,36 @@ class Start extends Component {
     }
   }
 
+  /**
+   * @function showToast
+   * @param {string} type 
+   * @param {string} text1 
+   * @param {string} text2 
+   */
+  showToast = async (type, text1, text2) => {
+    Toast.show({
+      type: type,
+      text1:text1,
+      text2: text2
+    })
+  }
+  /**
+   * @function handleButtonPress
+   * @description input validation -- Checks for name state
+   */
+  handleButtonPress = () => {
+    if(!this.state.name){
+      return this.showToast('error', 'Please enter your name')
+    }
+    this.props.navigation.navigate('Chat', {
+      name: this.state.name,
+      color: this.state.color,
+      contrastColor: this.state.contrastColor, 
+      textColor: this.state.textColor, 
+      isConnected: this.state.isConnected,
+      showToast: this.showToast
+      })
+  }
   render() {
     return (
       <KeyboardAvoidingView  behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
@@ -115,8 +146,7 @@ class Start extends Component {
             <Pressable
               style={[styles.button, {backgroundColor: this.state.color === '#FFFFFF' ? '#757082' : this.state.color}]}
               onPress={() => {
-                // Send name and color state as props to chat - Send Contrast color state for user's message bubbles
-                this.props.navigation.navigate('Chat', { name: this.state.name, color: this.state.color, contrastColor: this.state.contrastColor, textColor: this.state.textColor, isConnected: this.state.isConnected})
+                this.handleButtonPress()
                 }
               }>
                 <Text

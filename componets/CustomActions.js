@@ -18,13 +18,10 @@ function CustomActions({pickImage, takePhoto, getLocation}) {
       async (buttonIndex) => {
         switch(buttonIndex){
           case 0:
-            console.log('pick image')
             return await pickImage()
           case 1:
-            console.log('take photo')
             return await takePhoto()
           case 2:
-            console.log('get location')
             return await getLocation()
           default:
         }
