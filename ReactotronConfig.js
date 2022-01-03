@@ -4,7 +4,7 @@ Reactotron
   .use(asyncStorage())
   .setAsyncStorageHandler(AsyncStorage) // AsyncStorage would either come from `react-native` or `@react-native-community/async-storage` depending on where you get it from
   .configure({
-    name: "Chat App"
+    name: 'Chat App'
   })
   .useReactNative({
     asyncStorage: true, // there are more options to the async storage.
@@ -13,6 +13,6 @@ Reactotron
     },
     editor: false, // there are more options to editor
     errors: { veto: (stackFrame) => false }, // or turn it off with false
-    overlay: false, // just turning off overlay
+    overlay: false // just turning off overlay
   })
-  .connect();
+  .connect()

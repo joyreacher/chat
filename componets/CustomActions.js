@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
-import React, { useEffect } from "react"
+import React, { useEffect } from 'react'
 import { ActionSheetIOS, StyleSheet, TouchableHighlight, Text, View } from 'react-native'
-function CustomActions({pickImage, takePhoto, getLocation}) {
-  onActionPress = () =>{
+function CustomActions ({ pickImage, takePhoto, getLocation }) {
+  onActionPress = () => {
     const options = [
       'Choose From Library',
       'Take Picture',
@@ -13,10 +13,10 @@ function CustomActions({pickImage, takePhoto, getLocation}) {
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options,
-        cancelButtonIndex,
+        cancelButtonIndex
       },
       async (buttonIndex) => {
-        switch(buttonIndex){
+        switch (buttonIndex) {
           case 0:
             return await pickImage()
           case 1:
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     marginLeft: 10,
-    marginBottom: 10,
+    marginBottom: 10
   },
   wrapper: {
     borderRadius: 13,
@@ -60,13 +60,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     flex: 1,
     alignItems: 'center',
-    justifyContent:'center'
+    justifyContent: 'center'
   },
   iconText: {
     color: '#b2b2b2',
     fontWeight: 'bold',
     fontSize: 16,
     backgroundColor: 'transparent',
-    textAlign: 'center',
-  },
- });
+    textAlign: 'center'
+  }
+})

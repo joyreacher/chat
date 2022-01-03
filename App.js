@@ -1,6 +1,3 @@
-if(__DEV__) {
-  import('./ReactotronConfig').then(() => console.log('Reactotron Configured'))
-}
 import React from 'react'
 import Toast from 'react-native-toast-message'
 // React native routing
@@ -11,6 +8,9 @@ import { StyleSheet } from 'react-native'
 // components
 import Start from './componets/Start'
 import Chat from './componets/Chat'
+if (__DEV__) {
+  import('./ReactotronConfig').then(() => console.log('Reactotron Configured'))
+}
 // create the navigator
 const Stack = createStackNavigator()
 export default function App () {
