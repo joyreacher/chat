@@ -31,6 +31,7 @@ import FireBaseConfig from '../firestore/config'
 
 // Components
 import CustomActions from './CustomActions'
+import reactotron from 'reactotron-react-native'
 class Chat extends Component {
   constructor (props) {
     super(props)
@@ -52,9 +53,10 @@ class Chat extends Component {
       location: null,
       _isMounted: Boolean,
       status: '...',
+      systemMessageDate: new Date(),
       user: {
         _id: '',
-        name: '',
+        name: name,
         avatar:''
       }
     }
@@ -80,11 +82,10 @@ class Chat extends Component {
    * @param {string} avatar 
    */
   setUser(uid, avatar){
-    const { name } = this.props.route.params
     this.setState({
       user: {
         _id: uid,
-        name: name,
+        name: this.state.user.name,
         avatar:avatar
       }
     })
@@ -152,7 +153,6 @@ class Chat extends Component {
   }
   // Updates data with snapshot | returns message state with total number of messages in firebase db
   onCollectionUpdate = (querySnapShot) => {
-    const { name } = this.props.route.params
     // Set system message on every snapshot
     let messages = [
       {
@@ -170,7 +170,7 @@ class Chat extends Component {
           avatar: 'https://placeimg.com/140/140/any'
         },
       },
-    ]
+        ]
     // go through each document
     querySnapShot.forEach((doc) => {
       // get data
@@ -201,13 +201,15 @@ class Chat extends Component {
    *  If users name matches, messages will show on the right. Otherwise they show on left.
    */
   async findUser() {
+    // Retrieve messages in AsyncStorage
     await this.getMessages()
-    const { name } = this.props.route.params
     // Copy the AsyncStorage parsed array
     let messages = this.state.messages.map(user => {return user})
     // If the user had no messages saved error toast will show
     messages.map(message => {
+      if(message.user.name === this.state.user.name && this.state.user.name !== ''){
         this.showToast('info', `${message.user.name}'s messages are being served from memory`)
+        return this.setState({
           user:{
             _id: message.user._id,
             name: message.user.name,
@@ -221,6 +223,8 @@ class Chat extends Component {
    * @function componentDidMount()
    * @returns Authenticates the user if there is an internet connection
    */
+  async componentDidMount () {
+    await this.getMessages()
     await this.showToast('info', 'Authenticating') 
     await this.checkInternet().then(async () => {
       if(this.state.isConnected){
@@ -300,7 +304,7 @@ class Chat extends Component {
    */
   renderInputToolBar(props){
     if (this.state.isConnected === false){
-      
+      return
     } else {
       return(
         <InputToolbar 
@@ -477,13 +481,11 @@ class Chat extends Component {
           onSend={messages => this.onSend(messages)}
           renderLoading={this.loading}
           renderUsernameOnMessage={true}
-          user={
-            this.state.user
-          }
+          user={this.state.user}
           renderInputToolbar={messages => this.renderInputToolBar(messages)}
           renderActions={this.renderCustomActions}
           renderCustomView={this.renderCustomView}
-          
+          // renderSystemMessage={this.renderSystemMessage}
         />
         {/* Condition that checks for Android OS to use KeybordAvoidingView /> */}
         {Platform.OS === 'android' ? <KeyboardAvoidingView behavior='height' /> : null}
