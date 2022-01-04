@@ -214,11 +214,6 @@ class Chat extends Component {
             avatar: message.user.avatar
           }
         })
-        return console.log('found a match')
-      }
-      if(name === ''){
-        this.props.navigation.navigate('Start')
-        return this.state.showToast('error', 'Enter your name when offline')
       }
     })
   }
