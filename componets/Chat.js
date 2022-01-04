@@ -59,7 +59,18 @@ class Chat extends Component {
     }
     this.checkInternet()
   }
-  // Set user
+  /**
+   * @function showToast
+   * @param {string} type 
+   * @param {string} text1 
+   * @param {string} text2 
+   */
+  /**
+   * @function setUser()
+   * @returns User state Object
+   * @param {number} uid 
+   * @param {string} avatar 
+   */
   setUser(uid, avatar){
     const { name } = this.props.route.params
     this.setState({
@@ -70,8 +81,10 @@ class Chat extends Component {
       }
     })
   }
-  /** GET, SAVE, DELETE METHODS */
-  // Gets messages from asyncStorage (local storage for mobile devices)
+  /**
+   * @function getMessages()
+   * @returns Gets messages from asyncStorage (local storage for mobile devices)
+   */
   async getMessages(){
     let messages = ''
     try{
@@ -83,7 +96,10 @@ class Chat extends Component {
       this.state.showToast('error', 'No messages for user')
     }
   }
-  // Function saves message data to AsyncStorage as a string
+  /**
+   * @function saveMessages()
+   * @returns Function saves message data to AsyncStorage as a string
+   */
   async saveMessages(){
     try{
       await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages))
@@ -103,7 +119,10 @@ class Chat extends Component {
       this.state.showToast('error', 'Could not delete messages')
     }
   }
-  // Checks internet connection | returns isConnected State w/Bool
+  /**
+   * @function checkInternet()
+   * @returns Checks internet connection | returns isConnected State w/Bool
+   */
   async checkInternet(){
     if(this.state._isMounted){
       return NetInfo.fetch().then(connection => {
@@ -173,7 +192,11 @@ class Chat extends Component {
       messages,
     }) 
   }
-  // Iterates through message data stored in asyncStorage to return the user with the same name
+  /**
+   * @function findUser()
+   * @returns Iterates through message data stored in asyncStorage to return the user with the same name
+   *  If users name matches, messages will show on the right. Otherwise they show on left.
+   */
   async findUser() {
     await this.getMessages()
     const { name } = this.props.route.params
@@ -199,44 +222,10 @@ class Chat extends Component {
       }
     })
   }
-  // Authenticates the user if there is an internet connection
-  // Loads and filters asyncStorage data if not
-  componentDidMount () {
-    this.setState({_isMounted: true})
-    if(!this.state.isConnected){
-      this.setState({
-        messages: [
-          {
-          _id: Math.round(Math.random() * 1000000),
-          text:"Hello you are " + this.state.status,
-          createdAt: new Date(),
-          user: {
-            _id:Math.floor(Math.random() * 2000) + 1,
-            name: 'Bot',
-            avatar: 'https://placeimg.com/140/140/any'
-          },
-        },
-          {
-          _id: 2,
-          text: 'Hello ' + name + ' you are ' + this.state.status,
-          createAt: new Date(),
-          system: true
-        
-          }
-          
-        ]
-        })
-      return this.findUser()
-    }
-    this.getMessages()
-    
-    if(this.state.isConnected){
-    // Authenticate user
-    this.authUnsubscribe = firebase
-        .auth()
-        .onAuthStateChanged(async (message) => {
-        try{
-          if (!message) {
+  /**
+   * @function componentDidMount()
+   * @returns Authenticates the user if there is an internet connection
+   */
             await this.state.showToast('info', 'Authenticating')
             return await Promise.resolve(firebase.auth().signInAnonymously())
           }
@@ -252,7 +241,11 @@ class Chat extends Component {
       })
     }
   }
-  // Terminates observers and asyncronus functions
+  /**
+   * @function componentWillUnmount()
+   * @param object
+   * @returns Terminates observers and asyncronus functions
+   */
   componentWillUnmount() {
     this.setState({_isMounted: false})
     // Stop listening to authentication and collection changes
@@ -262,7 +255,11 @@ class Chat extends Component {
     this.referenceMessages
     
   }
-  // Control how the message bubbles look
+  /**
+   * @function renderInputToolBar()
+   * @param object
+   * @returns Control how the message bubbles look
+   */
   renderBubble (props) {
     const { contrastColor, textColor } = this.props.route.params
     return (
@@ -289,7 +286,11 @@ class Chat extends Component {
       />
     )
   }
-  // Hide the tool bar when there is no internet connection
+  /**
+   * @function renderInputToolBar()
+   * @param object
+   * @returns Hide the tool bar when there is no internet connection
+   */
   renderInputToolBar(props){
     if (this.state.isConnected === false){
       
@@ -301,6 +302,10 @@ class Chat extends Component {
       )
     }
   }
+  /**
+   * @function addMessage
+   * @returns Adds current message to firebase
+   */
   addMessage = async () =>{
     const messages = this.state.messages[0]
     await this.referenceMessages.add({
