@@ -73,7 +73,6 @@ class Start extends Component {
       contrastColor: this.state.contrastColor, 
       textColor: this.state.textColor, 
       isConnected: this.state.isConnected,
-      showToast: this.showToast
       })
   }
   render() {
