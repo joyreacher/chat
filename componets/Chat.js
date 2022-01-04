@@ -87,9 +87,9 @@ class Chat extends Component {
   async saveMessages(){
     try{
       await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages))
-        .then(() => this.stat.showToast('success', 'Saved message to storage'))
+        .then(() => this.state.showToast('success', 'Saved message to storage'))
     }catch(e){
-      this.state.showToast('info', 'No messages for user')
+      this.state.showToast('info', 'Could not save message to AsyncStorage')
     }
   }
   // Function deletes message data saved to AsyncStorage as a string
