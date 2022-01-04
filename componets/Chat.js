@@ -58,7 +58,7 @@ class Chat extends Component {
         avatar:''
       }
     }
-    this.checkInternet()
+    
   }
   /**
    * @function showToast
@@ -226,8 +226,31 @@ class Chat extends Component {
    * @returns Authenticates the user if there is an internet connection
    */
     await this.showToast('info', 'Authenticating') 
+    await this.checkInternet().then(async () => {
+      if(this.state.isConnected){
+      // Authenticate user
+      this.authUnsubscribe = firebase
+          .auth()
+          .onAuthStateChanged(async (message) => {
+          try{
+            if (!message) {
+              return await Promise.resolve(firebase.auth().signInAnonymously())
+            }
+            // this.setState({ user: { _id: message.uid, avatar: "https://placeimg.com/140/140/any"}})
+            this.setUser(message.uid, "https://placeimg.com/140/140/any")
+            this.unsubscribeMessagesUser = this.referenceMessages
+              .orderBy('createdAt', 'desc')
+              .onSnapshot(this.onCollectionUpdate)
             this.showToast('success', `📣 Hello ${this.state.user.name} 👏`, "Turn off internet to see stored messages")
+          }catch(e){
             this.showToast('error',` 👎 Could not authenticate`, "Check your internet connection and try again")
+          }
+        })
+      }
+      if(!this.state.isConnected){
+        this.findUser()
+      }
+    })
   }
   /**
    * @function componentWillUnmount()
