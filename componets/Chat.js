@@ -132,21 +132,23 @@ class Chat extends Component {
    * @returns Checks internet connection | returns isConnected State w/Bool
    */
   async checkInternet(){
-    if(this.state._isMounted){
-      return NetInfo.fetch().then(connection => {
-        if(connection.isConnected === true){
-          this.setState({
-            isConnected: true,
-            status: 'now online'
-          })
-          this.unsubscribe = this.referenceMessages
-            .orderBy("createdAt", "desc")
-            .onSnapshot(this.onCollectionUpdate);
+    return NetInfo.fetch().then(connection => {
+      if(connection.isConnected === true){
+        this.setState({
+          isConnected: true,
+          status: 'now online'
+        })
+        return this.unsubscribe = this.referenceMessages
+          .orderBy("createdAt", "desc")
+          .onSnapshot(this.onCollectionUpdate);
+      }
       this.showToast('error', "You have lost internet connection 🤔", "Please refresh the app") 
-          return false
-        }
+      return this.setState({
+        isConnected: false,
+        status: 'now offline'
       })
-    }
+    
+    })
   }
   // Updates data with snapshot | returns message state with total number of messages in firebase db
   onCollectionUpdate = (querySnapShot) => {
