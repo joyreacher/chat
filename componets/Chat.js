@@ -155,14 +155,13 @@ class Chat extends Component {
     let messages = [
       {
         _id: 2,
-        text: 'Hello ' + name + ' you are ' + this.state.status,
-        createAt: new Date(),
+        text: 'Hello ' + this.state.user.name + ' you are ' + this.state.status,
         system: true
       },
       {
         _id: Math.round(Math.random() * 1000000),
-        text:"Hello you are " + this.state.status,
-        createdAt: new Date(),
+        text:`Hello ${this.state.user.name}`,
+        createdAt: this.state.systemMessageDate,
         user: {
           _id:Math.floor(Math.random() * 2000) + 1,
           name: 'Bot',
